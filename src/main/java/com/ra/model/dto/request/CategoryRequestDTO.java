@@ -1,6 +1,6 @@
 package com.ra.model.dto.request;
 
-import com.ra.model.dto.OrderDetailDTO;
+import com.ra.model.entity.Product;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,11 +12,8 @@ import java.util.Set;
 @NoArgsConstructor
 @Data
 @Builder
-public class OrderRequestDTO {
-    private String address;
-    private String phone;
-    private String note;
-    private float total;
-    private Long userId;
-    private int status;
+public class CategoryRequestDTO {
+    private Long Id;
+    private String categoryName;
+    private Boolean status = true;
 }

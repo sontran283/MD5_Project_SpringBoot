@@ -13,8 +13,6 @@ public class OrderDetailDTO {
     private Long id;
     private float price;
     private int quantity;
-
     private Long productId;
-
     private Long ordersId;
 }

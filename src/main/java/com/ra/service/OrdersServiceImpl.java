@@ -1,5 +1,6 @@
 package com.ra.service;
 
+import com.ra.model.dto.OrderDetailDTO;
 import com.ra.model.dto.request.OrderRequestDTO;
 import com.ra.model.dto.response.OrderResponseDTO;
 import com.ra.model.entity.Orders;
@@ -13,6 +14,8 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class OrdersServiceImpl implements OrdersService {
@@ -63,8 +66,8 @@ public class OrdersServiceImpl implements OrdersService {
 
     @Override
     public Page<OrderResponseDTO> searchOrdersById(Pageable pageable, Integer id) {
-        Page<Orders> ordersPage=ordersRepository.findOrdersById(pageable, id);
-        return ordersPage.map(orders -> new OrderResponseDTO(orders.getId(),orders.getAddress(),orders.getPhone(),orders.getNote(), orders.getTotal(), orders.getStatus(),orders.getUser().getId(),orders.getOrderDetails()));
+        Page<Orders> ordersPage = ordersRepository.findOrdersById(pageable, id);
+        return ordersPage.map(this::mapToOrderResponseDTO);
     }
 
     @Override
@@ -74,15 +77,22 @@ public class OrdersServiceImpl implements OrdersService {
     }
 
     private OrderResponseDTO mapToOrderResponseDTO(Orders orders) {
-        return new OrderResponseDTO(
-                orders.getId(),
-                orders.getAddress(),
-                orders.getPhone(),
-                orders.getNote(),
-                orders.getTotal(),
-                orders.getUser().getId(),
-//                orders.getOrderDetails(),
-                orders.getStatus(),
-        );
+        Set<OrderDetailDTO> orderDetailDTOs = orders
+                .getOrderDetails()
+                .stream()
+                .map(orderDetail -> OrderDetailDTO
+                        .builder()
+                        .build())
+                .collect(Collectors.toSet());
+        return OrderResponseDTO.builder()
+                .id(orders.getId())
+                .address(orders.getAddress())
+                .phone(orders.getPhone())
+                .note(orders.getNote())
+                .total(orders.getTotal())
+                .userId(orders.getUser().getId())
+                .orderDetails(orderDetailDTOs)
+                .status(orders.getStatus())
+                .build();
     }
 }

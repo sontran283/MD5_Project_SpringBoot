@@ -1,14 +1,17 @@
 package com.ra.service;
 
+import com.ra.exception.CustomException;
 import com.ra.model.dto.request.ProductRequestDTO;
 import com.ra.model.dto.response.ProductResponseDTO;
 import com.ra.model.entity.Category;
 import com.ra.model.entity.Product;
+import com.ra.repository.CategoryRepository;
 import com.ra.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,13 +21,15 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     private ProductRepository productRepository;
     @Autowired
-    private CategoryService categoryService;
-    @Autowired
     private UploadService uploadService;
+    @Autowired
+    CategoryRepository categoryRepository;
+    @Autowired
+    CategoryService categoryService;
 
     @Override
     public List<ProductResponseDTO> findAll() {
-        List<Product> productList  = productRepository.findAll();
+        List<Product> productList = productRepository.findAll();
         return productList.stream().map(ProductResponseDTO::new).toList();
     }
 
@@ -34,24 +39,42 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponseDTO saveOrUpdate(ProductRequestDTO product) {
-        Product productNew = new Product();
-        productNew.setName(product.getName());
-        productNew.setPrice(product.getPrice());
+    public ProductResponseDTO saveOrUpdate(ProductRequestDTO productDTO) throws CustomException {
+        // check da ton tai
+        if (categoryRepository.existsByCategoryName(productDTO.getName())) {
+            throw new CustomException("productName already exists!");
+        }
+        if (productDTO.getId() == null) {
+            Product productNew = new Product();
+            productNew.setName(productDTO.getName());
+            productNew.setPrice(productDTO.getPrice());
 
-        // upload file
-        String fileName = uploadService.uploadImage(product.getFile());
-        productNew.setImage(fileName);
+            // Upload file
+            if (productDTO.getFile() != null && !productDTO.getFile().isEmpty()) {
+                String fileName = uploadService.uploadImage(productDTO.getFile());
+                productNew.setImage(fileName);
+            }
 
-        // Lấy category theo categoryId từ request DTO
-        Category category = categoryService.findById(product.getCategoryId());
+            // Lấy category theo categoryId từ request DTO
+            Category category = categoryRepository.findById(productDTO.getCategoryId()).orElse(null);
 
-        // Set category cho product
-        productNew.setCategory(category);
+            // Set category cho product
+            productNew.setCategory(category);
+        } else {
+            ProductResponseDTO productResponseDTO = findById(productDTO.getId());
+            productDTO.setId(productResponseDTO.getId());
+        }
 
+        Category category = categoryRepository.findById(productDTO.getCategoryId()).orElse(null);
         // Lưu sản phẩm
-        productRepository.save(productNew);
-
+        Product productNew = productRepository.save(Product.builder()
+                .price(productDTO.getPrice())
+                .category(category)
+                .image(String.valueOf(productDTO.getFile()))
+                .name(productDTO.getName())
+                .id(productDTO.getId())
+                .status(productDTO.getStatus())
+                .build());
         // Trả về ProductResponseDTO
         return new ProductResponseDTO(productNew);
     }
@@ -63,30 +86,29 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Product findProductById(Long id) {
-        return productRepository.findById(id).orElse(null);
+    public Product findProductById(Long id) throws CustomException {
+        Product product = productRepository.findById(id).orElse(null);
+        if (product == null) {
+            throw new CustomException("khong tim thay product voi id vua nhap");
+        }
+        return product;
     }
 
     @Override
     public Page<ProductResponseDTO> getAll(Pageable pageable) {
-        Page<Product> productDTOS = productRepository.findAll(pageable);
-        return productDTOS.map(product -> new ProductResponseDTO(product.getId(), product.getName(), product.getPrice(), product.getImage(), product.getCategory().getId(),product.getStatus()));
-    }
-
-    @Override
-    public Page<ProductResponseDTO> searchByName(Pageable pageable, String name) {
-        Page<Product> productPage = productRepository.findAllByProductNameContainingIgnoreCase(pageable, name);
+        Page<Product> productPage = productRepository.findAll(pageable);
         return productPage.map(product -> new ProductResponseDTO(product));
     }
 
     @Override
-    public ProductResponseDTO updateProductStatus(Long id, Boolean status) {
-        ProductResponseDTO existingProduct = findById(id);
-        if (existingProduct != null) {
-            existingProduct.setStatus(status);
-            ProductResponseDTO updatedProduct = saveOrUpdate(existingProduct.toProductRequestDTO());
-            return updatedProduct;
-        }
-        return null;
+    public Page<ProductResponseDTO> searchByName(Pageable pageable, String name) {
+        Page<Product> productPage = productRepository.findAllBy(pageable, name);
+        return productPage.map(product -> new ProductResponseDTO(product));
+    }
+
+    @Override
+    public void changeStatus(Long id) {
+        ProductResponseDTO productResponseDTO = findById(id);
+        productRepository.changeStatus(id);
     }
 }

@@ -1,5 +1,8 @@
 package com.ra.service;
 
+import com.ra.exception.CustomException;
+import com.ra.model.dto.request.CategoryRequestDTO;
+import com.ra.model.dto.response.CategoryResponseDTO;
 import com.ra.model.entity.Category;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -7,15 +10,17 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface CategoryService {
-    List<Category> findAll();
+    List<CategoryResponseDTO> findAll();
 
     void delete(Long id);
 
-    Category saveOrUpdate(Category category);
+    CategoryResponseDTO saveOrUpdate(CategoryRequestDTO category) throws CustomException;
 
-    Category findById(Long id);
+    CategoryResponseDTO findById(Long id) ;
 
-    Page<Category> getAll(Pageable pageable);
+    Page<CategoryResponseDTO> getAll(Pageable pageable);
 
-    Page<Category> searchByName(Pageable pageable, String name);
+    Page<CategoryResponseDTO> searchByName(Pageable pageable, String name);
+
+    void changeStatus(Long id);
 }

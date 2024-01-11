@@ -1,11 +1,12 @@
 package com.ra.model.dto.response;
 
-import com.ra.model.dto.request.ProductRequestDTO;
+
 import com.ra.model.entity.Product;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -26,13 +27,5 @@ public class ProductResponseDTO {
         this.image = product.getImage();
         this.categoryId = product.getCategory().getId();
         this.status = product.getStatus();
-    }
-    public ProductRequestDTO toProductRequestDTO() {
-        ProductRequestDTO productRequestDTO = new ProductRequestDTO();
-        productRequestDTO.setName(this.getName());
-        productRequestDTO.setPrice(this.getPrice());
-        productRequestDTO.setFile(null);
-        productRequestDTO.setCategoryId(this.getCategoryId());
-        return productRequestDTO;
     }
 }

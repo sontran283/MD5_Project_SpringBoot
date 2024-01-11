@@ -9,7 +9,7 @@ import java.io.File;
 import java.io.IOException;
 
 @Service
-public class UploadServiceImpl implements UploadService {
+public class  UploadServiceImpl implements UploadService {
     @Value("${path-upload}")
     private String pathUpload;
     @Value("${server.port}")
