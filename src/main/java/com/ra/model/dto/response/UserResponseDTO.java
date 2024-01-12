@@ -32,6 +32,4 @@ public class UserResponseDTO {
         this.address = user.getAddress();
         this.status = user.getStatus();
     }
-
-
 }

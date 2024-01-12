@@ -94,7 +94,12 @@ public class ProductController {
 
     // tìm kiếm sản phẩm theo tên với phân trang, sắp xếp
     @GetMapping("/products/search")
-    public ResponseEntity<Page<ProductResponseDTO>> searchProducts(@RequestParam(name = "search") String search, @RequestParam(name = "page", defaultValue = "0") int page, @RequestParam(name = "size", defaultValue = "10") int size, @RequestParam(name = "sort", defaultValue = "id") String sort, @RequestParam(name = "order", defaultValue = "asc") String order) {
+    public ResponseEntity<Page<ProductResponseDTO>> searchProducts(
+            @RequestParam(name = "search") String search,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestParam(name = "sort", defaultValue = "id") String sort,
+            @RequestParam(name = "order", defaultValue = "asc") String order) {
         Pageable pageable = createPageable(page, size, sort, order);
         Page<ProductResponseDTO> productDTOPage = productService.searchByName(pageable, search);
         return new ResponseEntity<>(productDTOPage, HttpStatus.OK);
@@ -102,7 +107,11 @@ public class ProductController {
 
     // lấy danh sách sản phẩm với phân trang, sắp xếp
     @GetMapping("/products/pagination")
-    public ResponseEntity<Page<ProductResponseDTO>> getPaginatedProducts(@RequestParam(name = "page", defaultValue = "0") int page, @RequestParam(name = "size", defaultValue = "10") int size, @RequestParam(name = "sort", defaultValue = "id") String sort, @RequestParam(name = "order", defaultValue = "asc") String order) {
+    public ResponseEntity<Page<ProductResponseDTO>> getPaginatedProducts(
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestParam(name = "sort", defaultValue = "id") String sort,
+            @RequestParam(name = "order", defaultValue = "asc") String order) {
         Pageable pageable = createPageable(page, size, sort, order);
         Page<ProductResponseDTO> productDTOPage = productService.getAll(pageable);
         return new ResponseEntity<>(productDTOPage, HttpStatus.OK);

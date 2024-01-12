@@ -2,6 +2,7 @@ package com.ra.model.dto.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
@@ -14,13 +15,15 @@ import java.util.Set;
 @Builder
 @Data
 public class UserRequestDTO {
-    @NotEmpty(message = "Please fill in userName")
+    @NotEmpty(message = "Cannot be left blank")
     private String userName;
-    @Size(min = 3, message = "Enter 8 numbers")
+    @Size(min = 3, max = 100, message = "Cannot be left blank")
     private String password;
-    @Email(message = "Invalid format email")
+    @NotEmpty(message = "Cannot be left blank")
+    @Email(message = "Must have @")
     private String email;
-    @NotEmpty(message = "Please fill in phoneNumber")
+    @Pattern(regexp = "(0[3|5|7|8|9])+([0-9]{8})\\b", message = "Enter the Vietnamese phone")
     private String phoneNumber;
+    @NotEmpty(message = "Cannot be left blank")
     private String address;
 }

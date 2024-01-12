@@ -7,6 +7,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.Set;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -17,14 +18,22 @@ public class UserPrinciple implements UserDetails {
     private Long id;
     private String userName;
     private String password;
+    private String email;
+    private String phoneNumber;
+    private String address;
+    private Boolean status = true;
     private Collection<? extends GrantedAuthority> authorities;
 
     public static UserDetails build(User user) {
-        return UserPrinciple.builder().
-                id(user.getId()).
-                userName(user.getUserName()).
-                password(user.getPassword()).
-                authorities(user.getRoles().stream().map(item -> new SimpleGrantedAuthority(item.getName())).toList()).build();
+        return UserPrinciple.builder()
+                .id(user.getId())
+                .userName(user.getUserName())
+                .password(user.getPassword())
+                .email(user.getEmail())
+                .phoneNumber(user.getPhoneNumber())
+                .address(user.getAddress())
+                .status(user.getStatus())
+                .authorities(user.getRoles().stream().map(item -> new SimpleGrantedAuthority(item.getName())).toList()).build();
     }
 
     @Override

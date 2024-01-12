@@ -31,4 +31,6 @@ public class User {
     )
     private Set<Role> roles;
 
+    @OneToOne(mappedBy = "user", fetch = FetchType.EAGER)
+    private Cart cart;
 }

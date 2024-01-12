@@ -71,16 +71,21 @@ public class UserServiceImpl implements UserService {
         UserPrinciple userPrinciple = (UserPrinciple) authentication.getPrincipal();
         return UserResponseDTO
                 .builder()
+                .id(userPrinciple.getId())
                 .token(jwtProvider.generateToken(userPrinciple))
                 .userName(userPrinciple.getUsername())
                 .roles(userPrinciple.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toSet()))
+                .email(userPrinciple.getEmail())
+                .phoneNumber(userPrinciple.getPhoneNumber())
+                .address(userPrinciple.getAddress())
+                .status(userPrinciple.getStatus())
                 .build();
     }
 
     @Override
-    public List<UserResponseAllDTO> findAll() {
-        List<User> userList = userRepository.findAll();
-        return userList.stream().map(UserResponseAllDTO::new).toList();
+    public Page<UserResponseAllDTO> findAll(Pageable pageable) {
+        Page<User> userPage = userRepository.findAll(pageable);
+        return userPage.map(UserResponseAllDTO::new);
     }
 
     @Override
@@ -91,7 +96,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponseDTO saveOrUpdate(UserRequestDTO userRequestDTO) throws CustomException {
         if (userRepository.existsByUserName(userRequestDTO.getUserName())) {
-            throw new CustomException("userName đã tồn tại");
+            throw new CustomException("username already exists!");
         }
         User user = User.builder()
                 .userName(userRequestDTO.getUserName())
@@ -143,30 +148,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void changeUserRole(Long id) throws CustomException {
-//        User user = userRepository.findById(id).orElseThrow(() -> new CustomException("User not found"));
-//
-//        if (user.getRoles().stream().anyMatch(role -> role.getName().equals("ADMIN"))) {
-//            throw new CustomException("User is already an ADMIN and cannot be downgraded to USER.");
-//        }
-//
-//        // Lọc và cập nhật vai trò trong danh sách của người dùng
-//        user.getRoles().forEach(role -> {
-//            if (role.getName().equals("USER")) {
-//                role.setName("ADMIN");
-//            }
-//        });
-//        userRepository.save(user);
         UserResponseDTO userResponseDTO = findById(id);
+        User user = userRepository.findById(id).orElse(null);
         if (userResponseDTO.getRoles().stream().anyMatch(role -> role.equals("ADMIN"))) {
             throw new CustomException("User is already an ADMIN and cannot be downgraded to USER.");
         }
-
         // Lọc và cập nhật vai trò trong danh sách của người dùng
-
-
         userResponseDTO.getRoles().removeIf(role -> role.equals("USER"));
         userResponseDTO.getRoles().add("ADMIN");
-
         Set<Role> roles = userResponseDTO.getRoles().stream().map(role -> roleService.findByRoleName(role)).collect(Collectors.toSet());
         userRepository.save(User.builder()
                 .id(userResponseDTO.getId())
@@ -176,6 +165,7 @@ public class UserServiceImpl implements UserService {
                 .phoneNumber(userResponseDTO.getPhoneNumber())
                 .status(userResponseDTO.getStatus())
                 .email(userResponseDTO.getEmail())
+                .password(user.getPassword())
                 .build());
     }
 }

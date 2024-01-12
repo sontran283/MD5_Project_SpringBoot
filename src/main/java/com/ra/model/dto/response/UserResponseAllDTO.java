@@ -6,6 +6,7 @@ import lombok.*;
 
 import java.util.Set;
 import java.util.stream.Collectors;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -13,6 +14,7 @@ import java.util.stream.Collectors;
 @Builder
 @Data
 public class UserResponseAllDTO {
+    private Long id;
     private String userName;
     private Set<String> roles;
     private String email;
@@ -20,6 +22,7 @@ public class UserResponseAllDTO {
     private String address;
 
     public UserResponseAllDTO(User user) {
+        this.id = user.getId();
         this.userName = user.getUserName();
         this.roles = user.getRoles().stream().map(Role::getName).collect(Collectors.toSet());
         this.email = user.getEmail();

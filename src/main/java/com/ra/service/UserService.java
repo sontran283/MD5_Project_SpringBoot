@@ -17,7 +17,7 @@ public interface UserService {
 
     UserResponseDTO login(UserRequestDTO userRequestDTO);
 
-    List<UserResponseAllDTO> findAll() throws CustomException;
+    Page<UserResponseAllDTO> findAll(Pageable pageable) throws CustomException;
 
     void delete(Long id) throws CustomException;
 

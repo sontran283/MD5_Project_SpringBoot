@@ -26,4 +26,6 @@ public class Product {
     @OneToMany(mappedBy = "product")
     @JsonIgnore
     private Set<OrderDetail> orderDetail;
+    @OneToOne(mappedBy = "product", fetch = FetchType.EAGER)
+    private Cart_item cartItem;
 }

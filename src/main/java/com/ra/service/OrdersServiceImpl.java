@@ -22,8 +22,6 @@ import java.util.stream.Collectors;
 public class OrdersServiceImpl implements OrdersService {
     @Autowired
     private OrdersRepository ordersRepository;
-    @Autowired
-    private UserService userService;
 
     @Override
     public List<OrderResponseDTO> findAll() {

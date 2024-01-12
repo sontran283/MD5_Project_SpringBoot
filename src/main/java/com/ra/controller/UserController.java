@@ -6,6 +6,7 @@ import com.ra.model.dto.response.UserResponseAllDTO;
 import com.ra.model.dto.response.UserResponseDTO;
 import com.ra.service.UserService;
 import jakarta.validation.Valid;
+import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,8 +36,8 @@ public class UserController {
 //    }
 
     @GetMapping("/users")
-    public ResponseEntity<List<UserResponseAllDTO>> getListUser() throws CustomException {
-        List<UserResponseAllDTO> userResponseDTOList = userService.findAll();
+    public ResponseEntity<Page<UserResponseAllDTO>> getListUser(Pageable pageable) throws CustomException {
+        Page<UserResponseAllDTO> userResponseDTOList = userService.findAll(pageable);
         return new ResponseEntity<>(userResponseDTOList, HttpStatus.OK);
     }
 
@@ -72,25 +74,45 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @GetMapping("/users/search+sort+pagination")
-    public ResponseEntity<Page<UserResponseDTO>> getUsers(@RequestParam(name = "search") String search, @RequestParam(name = "sort", defaultValue = "id") String sort, @RequestParam(name = "order", defaultValue = "asc") String order, @RequestParam(name = "size", defaultValue = "5") int size, @RequestParam(name = "page", defaultValue = "0") int page) throws CustomException {
-        Pageable pageable;
-        if (order.equals("asc")) {
-            pageable = PageRequest.of(page, size, Sort.by(sort).ascending());
-        } else {
-            pageable = PageRequest.of(page, size, Sort.by(sort).descending());
+    @GetMapping("/users/search-sort-pagination")
+    public ResponseEntity<Page<UserResponseDTO>> getUsers(
+            @RequestParam(name = "search", required = false) String search,
+            @RequestParam(name = "sort", defaultValue = "id") String sort,
+            @RequestParam(name = "order", defaultValue = "asc") String order,
+            @RequestParam(name = "size", defaultValue = "5") int size,
+            @RequestParam(name = "page", defaultValue = "0") int page) throws CustomException {
+        if (!order.equals("asc") && !order.equals("desc")) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+        if (search != null && search.isEmpty()) {
+            search = null;
+        }
+        Pageable pageable = order.equals("asc") ?
+                PageRequest.of(page, size, Sort.by(sort).ascending()) :
+                PageRequest.of(page, size, Sort.by(sort).descending());
         Page<UserResponseDTO> userPage = userService.searchByName(pageable, search);
         return new ResponseEntity<>(userPage, HttpStatus.OK);
     }
 
+
     // cập nhật trạng thái user
     @PatchMapping("/users/{id}")
     public ResponseEntity<?> changeStatus(@PathVariable Long id) throws CustomException {
-        userService.changeStatus(id);
-        UserResponseDTO userResponseDTO = userService.findById(id);
-        return new ResponseEntity<>(userResponseDTO, HttpStatus.OK);
+        try {
+            userService.changeStatus(id);
+            UserResponseDTO userResponseDTO = userService.findById(id);
+
+            // Check if the user is an ADMIN
+            if (userResponseDTO.getRoles().contains("ADMIN")) {
+                return new ResponseEntity<>("Cannot change status for ADMIN", HttpStatus.BAD_REQUEST);
+            }
+
+            return new ResponseEntity<>(userResponseDTO, HttpStatus.OK);
+        } catch (CustomException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
+
 
     // phân quyền
     @PatchMapping("/users/{id}/change-role")
