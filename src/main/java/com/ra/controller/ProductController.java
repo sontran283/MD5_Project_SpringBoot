@@ -24,31 +24,49 @@ public class ProductController {
     @Autowired
     private ProductService productService;
 
-    // index
-    @GetMapping("/products")
-    public ResponseEntity<List<ProductResponseDTO>> getListProducts() {
-        List<ProductResponseDTO> productDTOList = productService.findAll();
-        return new ResponseEntity<>(productDTOList, HttpStatus.OK);
+    // sort-pagination
+    @GetMapping("/products/sort-pagination")
+    public ResponseEntity<Page<ProductResponseDTO>> productIndex(
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "3") int size,
+            @RequestParam(name = "sort", defaultValue = "id") String sort,
+            @RequestParam(name = "order", defaultValue = "asc") String order) {
+        Pageable pageable;
+        if (order.equals("asc")) {
+            pageable = PageRequest.of(page, size, Sort.by(sort).ascending());
+        } else {
+            pageable = PageRequest.of(page, size, Sort.by(sort).descending());
+        }
+        Page<ProductResponseDTO> productResponseDTOS = productService.getAll(pageable);
+        return new ResponseEntity<>(productResponseDTOS, HttpStatus.OK);
     }
 
-    // add product
+    // search
+    @GetMapping("/products/search")
+    public ResponseEntity<Page<ProductResponseDTO>> productSearch(
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "3") int size,
+            @RequestParam(name = "sort", defaultValue = "id") String sort,
+            @RequestParam(name = "order", defaultValue = "asc") String order,
+            @RequestParam(name = "search") String search) {
+        Pageable pageable;
+        if (order.equals("asc")) {
+            pageable = PageRequest.of(page, size, Sort.by(sort).ascending());
+        } else {
+            pageable = PageRequest.of(page, size, Sort.by(sort).descending());
+        }
+        Page<ProductResponseDTO> productResponseDTOS = productService.searchByName(pageable, search);
+        return new ResponseEntity<>(productResponseDTOS, HttpStatus.OK);
+    }
+
+    // add
     @PostMapping("/products")
     public ResponseEntity<ProductResponseDTO> createProduct(@ModelAttribute ProductRequestDTO productRequestDTO) throws CustomException {
         ProductResponseDTO newProduct = productService.saveOrUpdate(productRequestDTO);
         return new ResponseEntity<>(newProduct, HttpStatus.CREATED);
     }
 
-    // delete product
-    @DeleteMapping("/products/{id}")
-    public ResponseEntity<?> deleteProduct(@PathVariable("id") Long id) throws CustomException {
-        if (productService.findProductById(id) != null) {
-            productService.delete(id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
-        return new ResponseEntity<>("NOT_FOUND", HttpStatus.NOT_FOUND);
-    }
-
-    // edit product
+    // edit
     @GetMapping("/products/{id}")
     public ResponseEntity<?> editProduct(@PathVariable("id") Long id) {
         ProductResponseDTO editedProduct = productService.findById(id);
@@ -58,7 +76,7 @@ public class ProductController {
         return new ResponseEntity<>("NOT_FOUND", HttpStatus.NOT_FOUND);
     }
 
-    // update product
+    // update
     @PutMapping("/products/{id}")
     public ResponseEntity<?> updateProduct(@PathVariable("id") Long id, @ModelAttribute ProductRequestDTO productRequestDTO) throws CustomException {
         ProductResponseDTO updatedProductRequest = productService.findById(id);
@@ -67,7 +85,7 @@ public class ProductController {
         return new ResponseEntity<>(updatedProduct, HttpStatus.OK);
     }
 
-    // cập nhật trạng thái sp
+    // change status
     @PatchMapping("/products/{id}")
     public ResponseEntity<?> changeStatus(@PathVariable Long id) {
         productService.changeStatus(id);
@@ -75,50 +93,13 @@ public class ProductController {
         return new ResponseEntity<>(productResponseDTO, HttpStatus.OK);
     }
 
-//    @GetMapping("/products/sort+search+pagination")
-//    public ResponseEntity<Page<ProductResponseDTO>> getProduct(
-//            @RequestParam(name = "page", defaultValue = "0") int page,
-//            @RequestParam(name = "size", defaultValue = "5") int size,
-//            @RequestParam(name = "sort", defaultValue = "id") String sort,
-//            @RequestParam(name = "order", defaultValue = "asc") String order,
-//            @RequestParam(name = "search") String search) {
-//        Pageable pageable;
-//        if (order.equals("asc")) {
-//            pageable = PageRequest.of(page, size, Sort.by(sort).ascending());
-//        } else {
-//            pageable = PageRequest.of(page, size, Sort.by(sort).descending());
-//        }
-//        Page<ProductResponseDTO> productPage = productService.searchByName(pageable, search);
-//        return new ResponseEntity<>(productPage, HttpStatus.OK);
-//    }
-
-    // tìm kiếm sản phẩm theo tên với phân trang, sắp xếp
-    @GetMapping("/products/search")
-    public ResponseEntity<Page<ProductResponseDTO>> searchProducts(
-            @RequestParam(name = "search") String search,
-            @RequestParam(name = "page", defaultValue = "0") int page,
-            @RequestParam(name = "size", defaultValue = "10") int size,
-            @RequestParam(name = "sort", defaultValue = "id") String sort,
-            @RequestParam(name = "order", defaultValue = "asc") String order) {
-        Pageable pageable = createPageable(page, size, sort, order);
-        Page<ProductResponseDTO> productDTOPage = productService.searchByName(pageable, search);
-        return new ResponseEntity<>(productDTOPage, HttpStatus.OK);
-    }
-
-    // lấy danh sách sản phẩm với phân trang, sắp xếp
-    @GetMapping("/products/pagination")
-    public ResponseEntity<Page<ProductResponseDTO>> getPaginatedProducts(
-            @RequestParam(name = "page", defaultValue = "0") int page,
-            @RequestParam(name = "size", defaultValue = "10") int size,
-            @RequestParam(name = "sort", defaultValue = "id") String sort,
-            @RequestParam(name = "order", defaultValue = "asc") String order) {
-        Pageable pageable = createPageable(page, size, sort, order);
-        Page<ProductResponseDTO> productDTOPage = productService.getAll(pageable);
-        return new ResponseEntity<>(productDTOPage, HttpStatus.OK);
-    }
-
-    private Pageable createPageable(int page, int size, String sort, String order) {
-        Sort.Direction sortDirection = order.equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
-        return PageRequest.of(page, size, sortDirection, sort);
+    // delete
+    @DeleteMapping("/products/{id}")
+    public ResponseEntity<?> deleteProduct(@PathVariable("id") Long id) throws CustomException {
+        if (productService.findProductById(id) != null) {
+            productService.delete(id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>("NOT_FOUND", HttpStatus.NOT_FOUND);
     }
 }

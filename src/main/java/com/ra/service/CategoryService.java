@@ -10,15 +10,13 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface CategoryService {
-    List<CategoryResponseDTO> findAll();
+    Page<Category> getAll(Pageable pageable);
 
     void delete(Long id);
 
     CategoryResponseDTO saveOrUpdate(CategoryRequestDTO category) throws CustomException;
 
     CategoryResponseDTO findById(Long id) ;
-
-    Page<CategoryResponseDTO> getAll(Pageable pageable);
 
     Page<CategoryResponseDTO> searchByName(Pageable pageable, String name);
 

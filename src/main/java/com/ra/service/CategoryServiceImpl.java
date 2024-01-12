@@ -20,9 +20,9 @@ public class CategoryServiceImpl implements CategoryService {
     private CategoryRepository categoryRepository;
 
     @Override
-    public List<CategoryResponseDTO> findAll() {
-        List<Category> categoryList = categoryRepository.findAll();
-        return categoryList.stream().map(CategoryResponseDTO::new).collect(Collectors.toList());
+    public Page<Category> getAll(Pageable pageable) {
+        Page<Category> categoryPage = categoryRepository.findAll(pageable);
+        return categoryPage.map(category -> new Category(category.getId(), category.getCategoryName(), category.getStatus()));
     }
 
     @Override
@@ -54,12 +54,6 @@ public class CategoryServiceImpl implements CategoryService {
         Optional<Category> categoryOptional = categoryRepository.findById(id);
         return categoryOptional.map(category -> new CategoryResponseDTO(category.getId(), category.getCategoryName(), category.getStatus()))
                 .orElse(null);
-    }
-
-    @Override
-    public Page<CategoryResponseDTO> getAll(Pageable pageable) {
-        Page<Category> categoryPage = categoryRepository.findAll(pageable);
-        return categoryPage.map(category -> new CategoryResponseDTO(category.getId(), category.getCategoryName(), category.getStatus()));
     }
 
     @Override

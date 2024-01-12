@@ -103,13 +103,13 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Page<ProductResponseDTO> getAll(Pageable pageable) {
         Page<Product> productPage = productRepository.findAll(pageable);
-        return productPage.map(product -> new ProductResponseDTO(product.getId(), product.getName(), product.getPrice(), product.getImage(), product.getCategory().getCategoryName(), product.getStatus()));
+        return productPage.map(ProductResponseDTO::new);
     }
 
     @Override
     public Page<ProductResponseDTO> searchByName(Pageable pageable, String name) {
         Page<Product> productPage = productRepository.searchProductByName(pageable, name);
-        return productPage.map(product -> new ProductResponseDTO(product.getId(), product.getName(), product.getPrice(), product.getImage(), product.getCategory().getCategoryName(), product.getStatus()));
+        return productPage.map(ProductResponseDTO::new);
     }
 
     @Override

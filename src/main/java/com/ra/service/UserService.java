@@ -3,6 +3,7 @@ package com.ra.service;
 
 import com.ra.exception.CustomException;
 import com.ra.model.dto.request.UserRequestDTO;
+import com.ra.model.dto.response.ProductResponseDTO;
 import com.ra.model.dto.response.UserResponseAllDTO;
 import com.ra.model.dto.response.UserResponseDTO;
 import com.ra.model.entity.Role;
@@ -25,7 +26,7 @@ public interface UserService {
 
     UserResponseDTO findById(Long id) throws CustomException;
 
-    Page<UserResponseDTO> searchByName(Pageable pageable, String name) throws CustomException;
+    Page<UserResponseAllDTO> searchByName(Pageable pageable, String name) throws CustomException;
 
     void changeStatus(Long id) throws CustomException;
 

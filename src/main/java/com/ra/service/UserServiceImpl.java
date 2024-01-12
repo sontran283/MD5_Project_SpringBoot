@@ -135,9 +135,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<UserResponseDTO> searchByName(Pageable pageable, String name) {
+    public Page<UserResponseAllDTO> searchByName(Pageable pageable, String name) {
         Page<User> userPage = userRepository.findAllByUserNameContainingIgnoreCase(pageable, name);
-        return userPage.map(UserResponseDTO::new);
+        return userPage.map(UserResponseAllDTO::new);
     }
 
     @Override

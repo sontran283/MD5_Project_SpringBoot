@@ -15,15 +15,8 @@ import java.util.List;
 @RestController
 public class HomeController {
     @Autowired
-    private ProductService productService;
-    @Autowired
     private EmailService emailService;
-
-    @RequestMapping("/products")
-    public ResponseEntity<?> getAllProduct() {
-        return new ResponseEntity<>("list", HttpStatus.OK);
-    }
-
+    
     @GetMapping("/testEmail")
     public ResponseEntity<?> testEmail() {
         emailService.sendMail();

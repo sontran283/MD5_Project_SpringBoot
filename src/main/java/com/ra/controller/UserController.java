@@ -26,14 +26,40 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-//    @GetMapping("/users")
-//    public ResponseEntity<Page<UserResponseDTO>> index(
-//            @RequestParam(defaultValue = "0") int page,
-//            @RequestParam(defaultValue = "5") int limit) throws CustomException {
-//        Pageable pageable = PageRequest.of(page, limit);
-//        Page<UserResponseDTO> responses = userService.findAll(pageable);
-//        return new ResponseEntity<>(responses, HttpStatus.OK);
-//    }
+    // sort-pagination
+    @GetMapping("/users/sort-pagination")
+    public ResponseEntity<?> userIndex(
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "limit", defaultValue = "3") int limit,
+            @RequestParam(name = "sort", defaultValue = "id") String sort,
+            @RequestParam(name = "order", defaultValue = "asc") String order) throws CustomException {
+        Pageable pageable;
+        if (order.equals("asc")) {
+            pageable = PageRequest.of(page, limit, Sort.by(sort).ascending());
+        } else {
+            pageable = PageRequest.of(page, limit, Sort.by(sort).descending());
+        }
+        Page<UserResponseAllDTO> userResponseAllDTOS = userService.findAll(pageable);
+        return new ResponseEntity<>(userResponseAllDTOS, HttpStatus.OK);
+    }
+
+    // search
+    @GetMapping("/users/search")
+    public ResponseEntity<Page<UserResponseAllDTO>> userSearch(
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "limit", defaultValue = "3") int limit,
+            @RequestParam(name = "sort", defaultValue = "id") String sort,
+            @RequestParam(name = "order", defaultValue = "asc") String order,
+            @RequestParam(name = "search") String search) throws CustomException {
+        Pageable pageable;
+        if (order.equals("asc")) {
+            pageable = PageRequest.of(page, limit, Sort.by(sort).ascending());
+        } else {
+            pageable = PageRequest.of(page, limit, Sort.by(sort).descending());
+        }
+        Page<UserResponseAllDTO> userResponseAllDTOS = userService.searchByName(pageable, search);
+        return new ResponseEntity<>(userResponseAllDTOS, HttpStatus.OK);
+    }
 
     @GetMapping("/users")
     public ResponseEntity<Page<UserResponseAllDTO>> getListUser(Pageable pageable) throws CustomException {
@@ -41,18 +67,14 @@ public class UserController {
         return new ResponseEntity<>(userResponseDTOList, HttpStatus.OK);
     }
 
+    // add
     @PostMapping("/users")
     public ResponseEntity<UserResponseDTO> create_user(@RequestBody @Valid UserRequestDTO userRequestDTO) throws CustomException {
         UserResponseDTO userResponseDTO = userService.saveOrUpdate(userRequestDTO);
         return new ResponseEntity<>(userResponseDTO, HttpStatus.CREATED);
     }
 
-    @DeleteMapping("/users/{id}")
-    public ResponseEntity<?> delete_user(@PathVariable("id") Long id) throws CustomException {
-        userService.delete(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
-
+    // edit
     @GetMapping("/users/{id}")
     public ResponseEntity<UserResponseDTO> edit_user(@PathVariable("id") Long id) throws CustomException {
         UserResponseDTO userResponseDTO = userService.findById(id);
@@ -62,6 +84,7 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
+    // update
     @PutMapping("/users/{id}")
     public ResponseEntity<UserResponseDTO> update_user(@PathVariable("id") Long id, @RequestBody UserRequestDTO userRequestDTO) throws CustomException {
         UserResponseDTO userResponseDTO = userService.findById(id);
@@ -74,35 +97,14 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @GetMapping("/users/search-sort-pagination")
-    public ResponseEntity<Page<UserResponseDTO>> getUsers(
-            @RequestParam(name = "search", required = false) String search,
-            @RequestParam(name = "sort", defaultValue = "id") String sort,
-            @RequestParam(name = "order", defaultValue = "asc") String order,
-            @RequestParam(name = "size", defaultValue = "5") int size,
-            @RequestParam(name = "page", defaultValue = "0") int page) throws CustomException {
-        if (!order.equals("asc") && !order.equals("desc")) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        if (search != null && search.isEmpty()) {
-            search = null;
-        }
-        Pageable pageable = order.equals("asc") ?
-                PageRequest.of(page, size, Sort.by(sort).ascending()) :
-                PageRequest.of(page, size, Sort.by(sort).descending());
-        Page<UserResponseDTO> userPage = userService.searchByName(pageable, search);
-        return new ResponseEntity<>(userPage, HttpStatus.OK);
-    }
 
-
-    // cập nhật trạng thái user
+    // change status
     @PatchMapping("/users/{id}")
     public ResponseEntity<?> changeStatus(@PathVariable Long id) throws CustomException {
         try {
             userService.changeStatus(id);
             UserResponseDTO userResponseDTO = userService.findById(id);
 
-            // Check if the user is an ADMIN
             if (userResponseDTO.getRoles().contains("ADMIN")) {
                 return new ResponseEntity<>("Cannot change status for ADMIN", HttpStatus.BAD_REQUEST);
             }
@@ -114,10 +116,17 @@ public class UserController {
     }
 
 
-    // phân quyền
+    // change Role
     @PatchMapping("/users/{id}/change-role")
     public ResponseEntity<?> changeUserRole(@PathVariable Long id) throws CustomException {
         userService.changeUserRole(id);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    // delete
+    @DeleteMapping("/users/{id}")
+    public ResponseEntity<?> delete_user(@PathVariable("id") Long id) throws CustomException {
+        userService.delete(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

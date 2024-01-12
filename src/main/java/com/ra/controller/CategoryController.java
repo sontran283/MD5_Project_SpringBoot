@@ -24,11 +24,39 @@ public class CategoryController {
     @Autowired
     private CategoryService categoryService;
 
-    // index
-    @GetMapping("/category")
-    public ResponseEntity<List<CategoryResponseDTO>> index() {
-        List<CategoryResponseDTO> categoryList = categoryService.findAll();
-        return new ResponseEntity<>(categoryList, HttpStatus.OK);
+    // sort-pagination
+    @GetMapping("/category/sort-pagination")
+    public ResponseEntity<Page<Category>> categoryIndex(
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "3") int size,
+            @RequestParam(name = "sort", defaultValue = "id") String sort,
+            @RequestParam(name = "order", defaultValue = "asc") String order) {
+        Pageable pageable;
+        if (order.equals("asc")) {
+            pageable = PageRequest.of(page, size, Sort.by(sort).ascending());
+        } else {
+            pageable = PageRequest.of(page, size, Sort.by(sort).descending());
+        }
+        Page<Category> categoryPage = categoryService.getAll(pageable);
+        return new ResponseEntity<>(categoryPage, HttpStatus.OK);
+    }
+
+    // search
+    @GetMapping("/category/search")
+    public ResponseEntity<Page<CategoryResponseDTO>> categorySearch(
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "3") int size,
+            @RequestParam(name = "sort", defaultValue = "id") String sort,
+            @RequestParam(name = "order", defaultValue = "asc") String order,
+            @RequestParam(name = "search") String search) {
+        Pageable pageable;
+        if (order.equals("asc")) {
+            pageable = PageRequest.of(page, size, Sort.by(sort).ascending());
+        } else {
+            pageable = PageRequest.of(page, size, Sort.by(sort).descending());
+        }
+        Page<CategoryResponseDTO> categoryPage = categoryService.searchByName(pageable, search);
+        return new ResponseEntity<>(categoryPage, HttpStatus.OK);
     }
 
     // add
@@ -57,7 +85,7 @@ public class CategoryController {
         return new ResponseEntity<>(updatedCategory, HttpStatus.OK);
     }
 
-    // cập nhật trạng thái danh mục
+    // change status
     @PatchMapping("/category/{id}")
     public ResponseEntity<?> changeStatus(@PathVariable Long id) {
         categoryService.changeStatus(id);
@@ -74,22 +102,5 @@ public class CategoryController {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
-
-    @GetMapping("/category/sort+search+pagination")
-    public ResponseEntity<Page<CategoryResponseDTO>> getCategories(
-            @RequestParam(name = "page", defaultValue = "0") int page,
-            @RequestParam(name = "size", defaultValue = "5") int size,
-            @RequestParam(name = "sort", defaultValue = "id") String sort,
-            @RequestParam(name = "order", defaultValue = "asc") String order,
-            @RequestParam(name = "search") String search) {
-        Pageable pageable;
-        if (order.equals("asc")) {
-            pageable = PageRequest.of(page, size, Sort.by(sort).ascending());
-        } else {
-            pageable = PageRequest.of(page, size, Sort.by(sort).descending());
-        }
-        Page<CategoryResponseDTO> categoryPage = categoryService.searchByName(pageable, search);
-        return new ResponseEntity<>(categoryPage, HttpStatus.OK);
     }
 }

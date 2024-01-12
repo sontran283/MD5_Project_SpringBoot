@@ -24,8 +24,10 @@ public class ProductResponseDTO {
         this.id = product.getId();
         this.name = product.getName();
         this.price = product.getPrice();
-        this.image = product.getImage();
-        this.categoryName = product.getCategory().getCategoryName();
         this.status = product.getStatus();
+        if (product.getCategory() != null) {
+            this.categoryName = product.getCategory().getCategoryName();
+        }
+        this.image = product.getImage();
     }
 }
