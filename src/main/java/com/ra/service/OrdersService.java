@@ -1,5 +1,6 @@
 package com.ra.service;
 
+import com.ra.exception.CustomException;
 import com.ra.model.dto.request.OrderRequestDTO;
 import com.ra.model.dto.response.OrderResponseDTO;
 import com.ra.model.entity.Orders;
@@ -17,7 +18,7 @@ public interface OrdersService {
 
     Orders findOrdersById(Long id);
 
-    OrderResponseDTO saveOrUpdate(OrderRequestDTO ordersDTO);
+    OrderResponseDTO saveOrUpdate(OrderRequestDTO ordersDTO) throws CustomException;
 
     Page<OrderResponseDTO> searchOrdersById(Pageable pageable, Integer id);
 

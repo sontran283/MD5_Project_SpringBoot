@@ -1,8 +1,11 @@
 package com.ra.service;
 
 
+import com.ra.exception.CustomException;
 import com.ra.model.dto.request.UserRequestDTO;
+import com.ra.model.dto.response.UserResponseAllDTO;
 import com.ra.model.dto.response.UserResponseDTO;
+import com.ra.model.entity.Role;
 import com.ra.model.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,15 +17,17 @@ public interface UserService {
 
     UserResponseDTO login(UserRequestDTO userRequestDTO);
 
-    List<User> findAll();
+    List<UserResponseAllDTO> findAll() throws CustomException;
 
-    void delete(Long id);
+    void delete(Long id) throws CustomException;
 
-    User saveOrUpdate(User user);
+    UserResponseDTO saveOrUpdate(UserRequestDTO userRequestDTO) throws CustomException;
 
-    User findById(Long id);
+    UserResponseDTO findById(Long id) throws CustomException;
 
-    Page<User> getAll(Pageable pageable);
+    Page<UserResponseDTO> searchByName(Pageable pageable, String name) throws CustomException;
 
-    Page<User> searchByName(Pageable pageable, String name);
+    void changeStatus(Long id) throws CustomException;
+
+    void changeUserRole(Long id) throws CustomException;
 }

@@ -1,5 +1,6 @@
 package com.ra.controller;
 
+import com.ra.exception.CustomException;
 import com.ra.model.dto.request.OrderRequestDTO;
 import com.ra.model.dto.response.OrderResponseDTO;
 import com.ra.service.OrdersService;
@@ -28,7 +29,7 @@ public class OrdersController {
 
     // add order
     @PostMapping("/orders")
-    public ResponseEntity<OrderResponseDTO> createOrders(@RequestBody OrderRequestDTO orderRequestDTO) {
+    public ResponseEntity<OrderResponseDTO> createOrders(@RequestBody OrderRequestDTO orderRequestDTO) throws CustomException {
         OrderResponseDTO newOrders = ordersService.saveOrUpdate(orderRequestDTO);
         return new ResponseEntity<>(newOrders, HttpStatus.CREATED);
     }
@@ -53,7 +54,7 @@ public class OrdersController {
     }
 
     @PatchMapping("/orders/{id}")
-    public ResponseEntity<?> changeStatus(@PathVariable("id") Long id, @RequestBody OrderRequestDTO orderRequestDTO) {
+    public ResponseEntity<?> changeStatus(@PathVariable("id") Long id, @RequestBody OrderRequestDTO orderRequestDTO) throws CustomException {
         OrderResponseDTO ordersDTO1 = ordersService.findById(id);
         if (ordersDTO1 != null) {
             ordersDTO1.setStatus(orderRequestDTO.getStatus());

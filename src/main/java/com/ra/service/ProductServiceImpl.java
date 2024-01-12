@@ -50,7 +50,7 @@ public class ProductServiceImpl implements ProductService {
             productNew.setPrice(productDTO.getPrice());
 
             // Upload file
-            if (productDTO.getFile() != null && !productDTO.getFile().isEmpty()) {
+            if (productDTO.getFile() != null && productDTO.getFile().getSize() > 0) {
                 String fileName = uploadService.uploadImage(productDTO.getFile());
                 productNew.setImage(fileName);
             }
@@ -60,23 +60,29 @@ public class ProductServiceImpl implements ProductService {
 
             // Set category cho product
             productNew.setCategory(category);
+
+            // save
+            productRepository.save(productNew);
+            return new ProductResponseDTO(productNew);
         } else {
             ProductResponseDTO productResponseDTO = findById(productDTO.getId());
-            productDTO.setId(productResponseDTO.getId());
+            String fileName = null;
+            if (productDTO.getFile() != null && !productDTO.getFile().isEmpty()) {
+                fileName = uploadService.uploadImage(productDTO.getFile());
+            } else {
+                fileName = productResponseDTO.getImage();
+            }
+            Category category = categoryRepository.findById(productDTO.getCategoryId()).orElse(null);
+            Product product = productRepository.save(Product.builder()
+                    .id(productResponseDTO.getId())
+                    .name(productDTO.getName())
+                    .price(productDTO.getPrice())
+                    .category(category)
+                    .status(productDTO.getStatus())
+                    .image(fileName)
+                    .build());
+            return new ProductResponseDTO(product);
         }
-
-        Category category = categoryRepository.findById(productDTO.getCategoryId()).orElse(null);
-        // Lưu sản phẩm
-        Product productNew = productRepository.save(Product.builder()
-                .price(productDTO.getPrice())
-                .category(category)
-                .image(String.valueOf(productDTO.getFile()))
-                .name(productDTO.getName())
-                .id(productDTO.getId())
-                .status(productDTO.getStatus())
-                .build());
-        // Trả về ProductResponseDTO
-        return new ProductResponseDTO(productNew);
     }
 
     @Override
@@ -97,13 +103,13 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Page<ProductResponseDTO> getAll(Pageable pageable) {
         Page<Product> productPage = productRepository.findAll(pageable);
-        return productPage.map(product -> new ProductResponseDTO(product));
+        return productPage.map(product -> new ProductResponseDTO(product.getId(), product.getName(), product.getPrice(), product.getImage(), product.getCategory().getCategoryName(), product.getStatus()));
     }
 
     @Override
     public Page<ProductResponseDTO> searchByName(Pageable pageable, String name) {
-        Page<Product> productPage = productRepository.findAllBy(pageable, name);
-        return productPage.map(product -> new ProductResponseDTO(product));
+        Page<Product> productPage = productRepository.searchProductByName(pageable, name);
+        return productPage.map(product -> new ProductResponseDTO(product.getId(), product.getName(), product.getPrice(), product.getImage(), product.getCategory().getCategoryName(), product.getStatus()));
     }
 
     @Override

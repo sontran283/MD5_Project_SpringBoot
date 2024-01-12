@@ -60,12 +60,10 @@ public class ProductController {
 
     // update product
     @PutMapping("/products/{id}")
-    public ResponseEntity<?> updateProduct(@PathVariable("id") Long id, @RequestBody ProductRequestDTO productRequestDTO) throws CustomException {
+    public ResponseEntity<?> updateProduct(@PathVariable("id") Long id, @ModelAttribute ProductRequestDTO productRequestDTO) throws CustomException {
         ProductResponseDTO updatedProductRequest = productService.findById(id);
         productRequestDTO.setId(updatedProductRequest.getId());
-
         ProductResponseDTO updatedProduct = productService.saveOrUpdate(productRequestDTO);
-
         return new ResponseEntity<>(updatedProduct, HttpStatus.OK);
     }
 
@@ -76,6 +74,23 @@ public class ProductController {
         ProductResponseDTO productResponseDTO = productService.findById(id);
         return new ResponseEntity<>(productResponseDTO, HttpStatus.OK);
     }
+
+//    @GetMapping("/products/sort+search+pagination")
+//    public ResponseEntity<Page<ProductResponseDTO>> getProduct(
+//            @RequestParam(name = "page", defaultValue = "0") int page,
+//            @RequestParam(name = "size", defaultValue = "5") int size,
+//            @RequestParam(name = "sort", defaultValue = "id") String sort,
+//            @RequestParam(name = "order", defaultValue = "asc") String order,
+//            @RequestParam(name = "search") String search) {
+//        Pageable pageable;
+//        if (order.equals("asc")) {
+//            pageable = PageRequest.of(page, size, Sort.by(sort).ascending());
+//        } else {
+//            pageable = PageRequest.of(page, size, Sort.by(sort).descending());
+//        }
+//        Page<ProductResponseDTO> productPage = productService.searchByName(pageable, search);
+//        return new ResponseEntity<>(productPage, HttpStatus.OK);
+//    }
 
     // tìm kiếm sản phẩm theo tên với phân trang, sắp xếp
     @GetMapping("/products/search")

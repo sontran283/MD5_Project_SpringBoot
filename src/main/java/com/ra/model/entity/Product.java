@@ -1,5 +1,6 @@
 package com.ra.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -23,5 +24,6 @@ public class Product {
     @JoinColumn(name = "catId", referencedColumnName = "id")
     private Category category;
     @OneToMany(mappedBy = "product")
+    @JsonIgnore
     private Set<OrderDetail> orderDetail;
 }

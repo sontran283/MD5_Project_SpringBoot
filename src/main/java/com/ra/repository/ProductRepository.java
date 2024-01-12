@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 
 @Transactional
 public interface ProductRepository extends JpaRepository<Product, Long> {
-    Page<Product> findAllBy(Pageable pageable, String name);
+    Page<Product> searchProductByName(Pageable pageable, String name);
 
     @Modifying
     @Query("update Product p set p.status=case when p.status=true then false else true end where p.id=?1")

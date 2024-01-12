@@ -17,7 +17,7 @@ public class ProductResponseDTO {
     private String name;
     private Float price;
     private String image;
-    private Long categoryId;
+    private String categoryName;
     private Boolean status = true;
 
     public ProductResponseDTO(Product product) {
@@ -25,7 +25,7 @@ public class ProductResponseDTO {
         this.name = product.getName();
         this.price = product.getPrice();
         this.image = product.getImage();
-        this.categoryId = product.getCategory().getId();
+        this.categoryName = product.getCategory().getCategoryName();
         this.status = product.getStatus();
     }
 }

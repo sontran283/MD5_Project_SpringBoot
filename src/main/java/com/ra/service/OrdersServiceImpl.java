@@ -1,5 +1,6 @@
 package com.ra.service;
 
+import com.ra.exception.CustomException;
 import com.ra.model.dto.OrderDetailDTO;
 import com.ra.model.dto.request.OrderRequestDTO;
 import com.ra.model.dto.response.OrderResponseDTO;
@@ -51,15 +52,16 @@ public class OrdersServiceImpl implements OrdersService {
     }
 
     @Override
-    public OrderResponseDTO saveOrUpdate(OrderRequestDTO ordersDTO) {
+    public OrderResponseDTO saveOrUpdate(OrderRequestDTO ordersDTO) throws CustomException {
         Orders orders = new Orders();
         orders.setAddress(ordersDTO.getAddress());
         orders.setNote(ordersDTO.getNote());
         orders.setPhone(ordersDTO.getPhone());
         orders.setTotal(ordersDTO.getTotal());
         orders.setStatus(1);
-        User user = userService.findById(ordersDTO.getUserId());
-        orders.setUser(user);
+
+//        User user = userService.findById(ordersDTO.getUserId());
+//        orders.setUser(user);
         orders = ordersRepository.save(orders);
         return mapToOrderResponseDTO(orders);
     }

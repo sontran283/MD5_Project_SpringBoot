@@ -1,5 +1,6 @@
 package com.ra.model.entity;
 
+import com.ra.model.dto.response.UserResponseDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -18,6 +19,8 @@ public class User {
     @Column(unique = true)
     private String userName;
     private String password;
+    private String phoneNumber;
+    private String address;
     @Column(columnDefinition = "Boolean default true")
     private Boolean status = true;
     @ManyToMany(fetch = FetchType.EAGER)
@@ -27,4 +30,5 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<Role> roles;
+
 }

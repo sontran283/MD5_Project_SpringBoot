@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/admin")
 public class AdminController {
     @GetMapping("/")
-    public ResponseEntity<?> getAdmin(){
+    public ResponseEntity<?> admin(){
         return new ResponseEntity<>( "您好! Admin",HttpStatus.OK);
     }
 }
