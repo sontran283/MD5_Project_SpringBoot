@@ -24,4 +24,10 @@ public class Cart {
 
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL)
     private Set<Cart_item> cartItems;
+
+    public Cart(Cart cart) {
+        this.id = cart.getId();
+        this.user = cart.getUser();
+        this.cartItems = cart.getCartItems();
+    }
 }

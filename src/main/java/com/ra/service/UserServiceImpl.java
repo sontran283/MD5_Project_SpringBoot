@@ -84,21 +84,16 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponseDTO login(UserRequestDTO userRequestDTO) {
         Authentication authentication;
-        authentication = authenticationProvider
-                .authenticate(new UsernamePasswordAuthenticationToken(userRequestDTO.getUserName(), userRequestDTO.getPassword()));
-        UserPrinciple userPrinciple = (UserPrinciple) authentication.getPrincipal();
-        return UserResponseDTO
-                .builder()
-                .id(userPrinciple.getId())
-                .token(jwtProvider.generateToken(userPrinciple))
-                .userName(userPrinciple.getUsername())
-                .roles(userPrinciple.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toSet()))
-                .email(userPrinciple.getEmail())
-                .phoneNumber(userPrinciple.getPhoneNumber())
-                .address(userPrinciple.getAddress())
-                .status(userPrinciple.getStatus())
-                .build();
+        authentication=authenticationProvider
+                .authenticate(new UsernamePasswordAuthenticationToken(userRequestDTO.getUserName(),userRequestDTO.getPassword()));
+        UserPrinciple userPrinciple= (UserPrinciple) authentication.getPrincipal();
+
+        System.out.println(userPrinciple.getUsername());
+        return UserResponseDTO.builder().
+                token(jwtProvider.generateToken(userPrinciple)).userName(userPrinciple.getUsername())
+                .roles(userPrinciple.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toSet())).build();
     }
+
 
     @Override
     public Page<UserResponseAllDTO> findAll(Pageable pageable) {

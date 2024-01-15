@@ -9,32 +9,17 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.Set;
 
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
 @Builder
 public class UserPrinciple implements UserDetails {
-    private Long id;
-    private String userName;
-    private String password;
-    private String email;
-    private String phoneNumber;
-    private String address;
-    private Boolean status = true;
-    private Collection<? extends GrantedAuthority> authorities;
-
-    public static UserDetails build(User user) {
-        return UserPrinciple.builder()
-                .id(user.getId())
-                .userName(user.getUserName())
-                .password(user.getPassword())
-                .email(user.getEmail())
-                .phoneNumber(user.getPhoneNumber())
-                .address(user.getAddress())
-                .status(user.getStatus())
-                .authorities(user.getRoles().stream().map(item -> new SimpleGrantedAuthority(item.getName())).toList()).build();
+    private User user;
+    public Long getUserId() {
+        return user.getId();
     }
+    private Collection<? extends GrantedAuthority> authorities;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -43,12 +28,12 @@ public class UserPrinciple implements UserDetails {
 
     @Override
     public String getPassword() {
-        return password;
+        return user.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return userName;
+        return user.getUserName();
     }
 
     @Override
