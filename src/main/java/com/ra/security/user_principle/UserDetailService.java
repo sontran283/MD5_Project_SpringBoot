@@ -14,14 +14,16 @@ import org.springframework.stereotype.Service;
 public class UserDetailService implements UserDetailsService {
     @Autowired
     private UserRepository userRepository;
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user=userRepository.findByUserName(username);
-        UserPrinciple userPrinciple=new UserPrinciple();
+        User user = userRepository.findByUserName(username);
+        UserPrinciple userPrinciple = new UserPrinciple();
         userPrinciple.setUser(user);
         userPrinciple.setAuthorities(user.getRoles().stream().map(role -> new SimpleGrantedAuthority(role.getName())).toList());
         return userPrinciple;
     }
+
     public Long getUserIdFromAuthentication(Authentication authentication) {
         if (authentication == null) {
             return null;
@@ -35,5 +37,4 @@ public class UserDetailService implements UserDetailsService {
 
         return null;
     }
-
 }

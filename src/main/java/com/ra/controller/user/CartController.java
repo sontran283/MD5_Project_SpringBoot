@@ -3,9 +3,13 @@ package com.ra.controller.user;
 import com.ra.exception.ProductNotFoundException;
 import com.ra.exception.UserNotFoundException;
 import com.ra.model.dto.request.AddtoCartRequestDTO;
+import com.ra.model.dto.response.OrderResponseDTO;
 import com.ra.model.entity.Cart;
+import com.ra.model.entity.Cart_item;
 import com.ra.model.entity.Product;
 import com.ra.model.entity.User;
+import com.ra.repository.CartItemRepository;
+import com.ra.repository.CartRepository;
 import com.ra.security.user_principle.UserDetailService;
 import com.ra.service.CartService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,36 +28,39 @@ public class CartController {
     private CartService cartService;
     @Autowired
     private UserDetailService userDetailService;
+    @Autowired
+    private CartItemRepository cartItemRepository;
 
     // add to cart
     @PostMapping("/add")
     public ResponseEntity<String> addToCart(@RequestBody AddtoCartRequestDTO addtoCartRequestDTO, Authentication authentication) throws UserNotFoundException, ProductNotFoundException {
-        Long userId=userDetailService.getUserIdFromAuthentication(authentication);
-        cartService.addToCart(userId,addtoCartRequestDTO);
+        Long userId = userDetailService.getUserIdFromAuthentication(authentication);
+        cartService.addToCart(userId, addtoCartRequestDTO);
         return new ResponseEntity<>("Product added to cart successfully", HttpStatus.OK);
-    }
-
-    // delete
-    @DeleteMapping("/remove")
-    public ResponseEntity<String> removeFromCart(@RequestBody Product product, @RequestParam User user) {
-        Cart cart = cartService.getUserCart(user);
-        cartService.removeFromCart(user, product);
-        return new ResponseEntity<>("Product removed from cart successfully", HttpStatus.OK);
     }
 
     // list cart items
     @GetMapping("/index")
-    public ResponseEntity<List<Product>> getCartItems(@RequestParam User user) {
-        Cart cart = cartService.getUserCart(user);
-        List<Product> cartItems = cartService.getCartItems(user);
-        return new ResponseEntity<>(cartItems, HttpStatus.OK);
+    public ResponseEntity<List<Cart_item>> getCartItems() {
+        List<Cart_item> cartItemList = cartService.findAll();
+        return new ResponseEntity<>(cartItemList, HttpStatus.OK);
     }
 
-    // delete all
-    @DeleteMapping("/clear")
-    public ResponseEntity<String> clearCart(@RequestParam User user) {
-        Cart cart = cartService.getUserCart(user);
-        cartService.clearCart(user);
+    // delete by ID
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<String> removeFromCart(@PathVariable Long id) {
+        Cart_item cartItem = cartItemRepository.findCart_itemById(id);
+        if (cartItem != null) {
+            cartItemRepository.deleteById(cartItem.getId());
+            return new ResponseEntity<>("Product removed from cart successfully", HttpStatus.OK);
+        }
+        return new ResponseEntity<>("NOT_FOUND", HttpStatus.NOT_FOUND);
+    }
+
+    // clear All
+    @DeleteMapping("/clearAll")
+    public ResponseEntity<String> clearCart() {
+        cartService.clearCart();
         return new ResponseEntity<>("Cart cleared successfully", HttpStatus.OK);
     }
 

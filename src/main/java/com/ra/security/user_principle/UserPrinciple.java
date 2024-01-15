@@ -16,10 +16,12 @@ import java.util.Set;
 @Builder
 public class UserPrinciple implements UserDetails {
     private User user;
+
+    private Collection<? extends GrantedAuthority> authorities;
+
     public Long getUserId() {
         return user.getId();
     }
-    private Collection<? extends GrantedAuthority> authorities;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

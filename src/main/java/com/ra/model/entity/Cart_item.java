@@ -26,4 +26,12 @@ public class Cart_item {
 
     private int quantity;
     private float price;
+
+    public Cart_item(Cart_item cartItem) {
+        this.id = cartItem.getId();
+        this.cart = cartItem.getCart();
+        this.product = cartItem.getProduct();
+        this.quantity = cartItem.getQuantity();
+        this.price = cartItem.getPrice();
+    }
 }

@@ -12,6 +12,7 @@ import com.ra.repository.CartItemRepository;
 import com.ra.repository.CartRepository;
 import com.ra.repository.ProductRepository;
 import com.ra.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,35 +35,37 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public List<Cart> findAll() {
-        List<Cart> cartList = cartRepository.findAll();
-        return cartList.stream().map(Cart::new).toList();
+    public List<Cart_item> findAll() {
+        List<Cart_item> cartList = cartItemRepository.findAll();
+        return cartList.stream().map(Cart_item::new).toList();
     }
 
     @Override
     public void addToCart(Long userId, AddtoCartRequestDTO addtoCartRequestDTO) throws UserNotFoundException, ProductNotFoundException {
-        User user1=userRepository.findById(userId).orElseThrow(()->new UserNotFoundException("User id not found"));
-        Cart cart=cartRepository.findByUser(user1);
-        Product product=productRepository.findById(addtoCartRequestDTO.getProductId()).orElseThrow(()->new ProductNotFoundException("product id not found"));
-        if (cart==null){
-            Cart cart1=new Cart();
+        User user1 = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User id not found"));
+        Cart cart = cartRepository.findByUser(user1);
+        Product product = productRepository.findById(addtoCartRequestDTO.getProductId()).orElseThrow(() -> new ProductNotFoundException("product id not found"));
+
+        if (cart == null) {
+            Cart cart1 = new Cart();
             cart1.setUser(user1);
             cartRepository.save(cart1);
         }
 
-        Cart_item cartItem=cartItemRepository.findAllByCartAndProduct(cart,product);
-        Cart_item cartItem1=new Cart_item();
-        cartItem1.setCart(cart);
-        cartItem1.setProduct(product);
-        cartItem1.setQuantity(addtoCartRequestDTO.getQuantity());
-        cartItem1.setPrice(product.getPrice());
-        cartItemRepository.save(cartItem1);
+        if (cartItemRepository.existsCart_itemByCartAndProduct(cart, product)) {
+            Cart_item cartItem = cartItemRepository.findByCartAndProduct(cart, product);
+            cartItem.setQuantity(cartItem.getQuantity() + addtoCartRequestDTO.getQuantity());
+            cartItemRepository.save(cartItem);
+        } else {
+            Cart_item cartItem1 = new Cart_item();
+            cartItem1.setCart(cart);
+            cartItem1.setProduct(product);
+            cartItem1.setQuantity(addtoCartRequestDTO.getQuantity());
+            cartItem1.setPrice(product.getPrice());
+            cartItemRepository.save(cartItem1);
+        }
     }
 
-    @Override
-    public void removeFromCart(User user, Product product) {
-        cartRepository.removeFromCart(user.getId(), product.getId());
-    }
 
     @Override
     public List<Product> getCartItems(User user) {
@@ -70,8 +73,13 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public void clearCart(User user) {
-        cartRepository.clearCart(user.getId());
+    public void removeFromCart(Long id) {
+        cartItemRepository.deleteById(id);
+    }
+
+    @Override
+    public void clearCart() {
+        cartItemRepository.deleteAll();
     }
 
     @Override

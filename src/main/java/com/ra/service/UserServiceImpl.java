@@ -76,6 +76,7 @@ public class UserServiceImpl implements UserService {
         newUser.setAddress(user.getAddress());
         newUser.setStatus(user.getStatus());
         newUser.setRoles(roles);
+        newUser.setCart(user.getCart());
 
         // Lưu người dùng mới
         return userRepository.save(newUser);
@@ -84,14 +85,17 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponseDTO login(UserRequestDTO userRequestDTO) {
         Authentication authentication;
-        authentication=authenticationProvider
-                .authenticate(new UsernamePasswordAuthenticationToken(userRequestDTO.getUserName(),userRequestDTO.getPassword()));
-        UserPrinciple userPrinciple= (UserPrinciple) authentication.getPrincipal();
+        authentication = authenticationProvider
+                .authenticate(new UsernamePasswordAuthenticationToken(userRequestDTO.getUserName(), userRequestDTO.getPassword()));
+        UserPrinciple userPrinciple = (UserPrinciple) authentication.getPrincipal();
 
         System.out.println(userPrinciple.getUsername());
-        return UserResponseDTO.builder().
-                token(jwtProvider.generateToken(userPrinciple)).userName(userPrinciple.getUsername())
-                .roles(userPrinciple.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toSet())).build();
+        return UserResponseDTO.builder()
+                .id(userPrinciple.getUserId())
+                .token(jwtProvider.generateToken(userPrinciple))
+                .userName(userPrinciple.getUsername())
+                .roles(userPrinciple.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toSet()))
+                .build();
     }
 
 

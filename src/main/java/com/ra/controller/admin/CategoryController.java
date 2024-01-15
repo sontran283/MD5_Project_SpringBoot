@@ -3,7 +3,6 @@ package com.ra.controller.admin;
 import com.ra.exception.CustomException;
 import com.ra.model.dto.request.CategoryRequestDTO;
 import com.ra.model.dto.response.CategoryResponseDTO;
-import com.ra.model.dto.response.ProductResponseDTO;
 import com.ra.model.entity.Category;
 import com.ra.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;

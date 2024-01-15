@@ -28,10 +28,8 @@ public class ApplicationHandler { // xử lý các exception cho các controller
     public ResponseEntity<String> customException(CustomException e) {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
     }
-    @ExceptionHandler(UserNotFoundException.class)  //  annotation này sẽ được sử dụng để xử lý một loại exception cụ thể
-    // khi một CustomException được ném ra trong ứng dụng, phương thức này sẽ được gọi để xử lý exception đó
+    @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<String> UserNotFoundException(UserNotFoundException e) {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
     }
-
 }
