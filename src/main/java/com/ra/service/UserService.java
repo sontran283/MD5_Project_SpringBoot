@@ -14,7 +14,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface UserService {
-    User register(User user);
+    User register(User user) throws CustomException;
 
     UserResponseDTO login(UserRequestDTO userRequestDTO);
 

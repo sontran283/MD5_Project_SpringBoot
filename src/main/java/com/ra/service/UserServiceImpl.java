@@ -40,18 +40,34 @@ public class UserServiceImpl implements UserService {
     private RoleService roleService;
 
     @Override
-    public User register(User user) {
-        // ma hoa mat khau
+    public User register(User user) throws CustomException {
+        // kiểm tra xem tên đăng nhập đã tồn tại chưa
+        if (userRepository.existsByUserName(user.getUserName())) {
+            throw new CustomException("Username already exists");
+        }
+
+        // kiểm tra xem email đã tồn tại chưa
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new CustomException("Email already exists");
+        }
+
+        // kiểm tra xem số điện thoại đã tồn tại chưa
+        if (userRepository.existsByPhoneNumber(user.getPhoneNumber())) {
+            throw new CustomException("PhoneNumber already exists");
+        }
+
+        // mã hóa mật khẩu
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+
         // role
         Set<Role> roles = new HashSet<>();
-        // register cua user thi coi no la USER
         if (user.getRoles() == null || user.getRoles().isEmpty()) {
             roles.add(roleService.findByRoleName("USER"));
         } else {
-            // tao tai khoan va phan quyen thi phai co quyen ADMIN
             user.getRoles().forEach(role -> roles.add(roleService.findByRoleName(role.getName())));
         }
+
+        // Tạo đối tượng người dùng mới
         User newUser = new User();
         newUser.setUserName(user.getUserName());
         newUser.setEmail(user.getEmail());
@@ -60,6 +76,8 @@ public class UserServiceImpl implements UserService {
         newUser.setAddress(user.getAddress());
         newUser.setStatus(user.getStatus());
         newUser.setRoles(roles);
+
+        // Lưu người dùng mới
         return userRepository.save(newUser);
     }
 
@@ -151,8 +169,9 @@ public class UserServiceImpl implements UserService {
         UserResponseDTO userResponseDTO = findById(id);
         User user = userRepository.findById(id).orElse(null);
         if (userResponseDTO.getRoles().stream().anyMatch(role -> role.equals("ADMIN"))) {
-            throw new CustomException("User is already an ADMIN and cannot be downgraded to USER.");
+            throw new CustomException("Already an ADMIN and cannot be downgraded to USER");
         }
+
         // Lọc và cập nhật vai trò trong danh sách của người dùng
         userResponseDTO.getRoles().removeIf(role -> role.equals("USER"));
         userResponseDTO.getRoles().add("ADMIN");

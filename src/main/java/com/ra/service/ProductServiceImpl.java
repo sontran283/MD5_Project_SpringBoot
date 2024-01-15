@@ -23,9 +23,9 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     private UploadService uploadService;
     @Autowired
-    CategoryRepository categoryRepository;
+    private CategoryRepository categoryRepository;
     @Autowired
-    CategoryService categoryService;
+    private CategoryService categoryService;
 
     @Override
     public List<ProductResponseDTO> findAll() {
@@ -95,7 +95,7 @@ public class ProductServiceImpl implements ProductService {
     public Product findProductById(Long id) throws CustomException {
         Product product = productRepository.findById(id).orElse(null);
         if (product == null) {
-            throw new CustomException("khong tim thay product voi id vua nhap");
+            throw new CustomException("No product found with the id just entered");
         }
         return product;
     }

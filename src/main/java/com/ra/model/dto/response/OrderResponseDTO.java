@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @AllArgsConstructor
@@ -18,6 +19,7 @@ public class OrderResponseDTO {
     private String phone;
     private String note;
     private float total;
+    private LocalDateTime order_date;
     private Long userId;
     private Set<OrderDetailDTO> orderDetails;
     private int status;

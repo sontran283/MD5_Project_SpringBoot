@@ -1,4 +1,4 @@
-package com.ra.controller;
+package com.ra.controller.admin;
 
 import com.ra.exception.CustomException;
 import com.ra.model.dto.request.CategoryRequestDTO;

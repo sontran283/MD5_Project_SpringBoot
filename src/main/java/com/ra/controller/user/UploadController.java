@@ -1,4 +1,4 @@
-package com.ra.controller;
+package com.ra.controller.user;
 
 import com.ra.service.UploadService;
 import org.springframework.beans.factory.annotation.Autowired;

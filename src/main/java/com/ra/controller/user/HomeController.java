@@ -1,4 +1,4 @@
-package com.ra.controller;
+package com.ra.controller.user;
 
 import com.ra.model.dto.response.ProductResponseDTO;
 import com.ra.service.EmailService;

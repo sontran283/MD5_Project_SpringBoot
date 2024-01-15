@@ -1,5 +1,6 @@
-package com.ra.controller;
+package com.ra.controller.user;
 
+import com.ra.exception.CustomException;
 import com.ra.model.dto.request.UserRequestDTO;
 import com.ra.model.dto.response.UserResponseDTO;
 import com.ra.model.entity.User;
@@ -19,7 +20,7 @@ public class AuthController {
     private UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody User user) {
+    public ResponseEntity<?> register(@RequestBody User user) throws CustomException {
         return new ResponseEntity<>(userService.register(user), HttpStatus.OK);
     }
 

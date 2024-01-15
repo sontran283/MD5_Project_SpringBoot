@@ -1,4 +1,4 @@
-package com.ra.controller;
+package com.ra.controller.admin;
 
 import com.ra.exception.CustomException;
 import com.ra.model.dto.request.UserRequestDTO;
@@ -6,7 +6,6 @@ import com.ra.model.dto.response.UserResponseAllDTO;
 import com.ra.model.dto.response.UserResponseDTO;
 import com.ra.service.UserService;
 import jakarta.validation.Valid;
-import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -14,11 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-
 
 @RestController
 @RequestMapping("/admin")
@@ -97,7 +92,6 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-
     // change status
     @PatchMapping("/users/{id}")
     public ResponseEntity<?> changeStatus(@PathVariable Long id) throws CustomException {
@@ -114,7 +108,6 @@ public class UserController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
-
 
     // change Role
     @PatchMapping("/users/{id}/change-role")
