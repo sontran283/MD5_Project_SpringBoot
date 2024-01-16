@@ -25,6 +25,8 @@ public interface UserService {
 
     UserResponseDTO findById(Long id) throws CustomException;
 
+    UserResponseAllDTO findByIdd(Long id) throws CustomException;
+
     Page<UserResponseAllDTO> searchByName(Pageable pageable, String name) throws CustomException;
 
     void changeStatus(Long id) throws CustomException;
@@ -32,4 +34,10 @@ public interface UserService {
     void changeUserRole(Long id) throws CustomException;
 
     User getCurrentUser(Authentication authentication);
+
+    boolean validateOldPassword(User user, String oldPassword);
+
+    void changePassword(User user, String newPassword) throws CustomException;
+
+    UserResponseAllDTO changeProfile(Long id, UserRequestDTO userRequestDTO);
 }

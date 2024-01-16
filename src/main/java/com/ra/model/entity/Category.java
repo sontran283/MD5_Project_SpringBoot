@@ -1,5 +1,6 @@
 package com.ra.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,6 +20,7 @@ public class Category {
     @Column(columnDefinition = "boolean default true")
     private Boolean status = true;
     @OneToMany(mappedBy = "category", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+    @JsonIgnore
     private Set<Product> products;
     // mappedBy = "category" ___ chỉ định trường nào trong đối tượng Product sẽ quản lý mối quan hệ
     // cascade = CascadeType.REMOVE ___ nghĩa là khi đối tượng Category bị xóa, tất cả các sản phẩm liên quan cũng sẽ bị xóa.

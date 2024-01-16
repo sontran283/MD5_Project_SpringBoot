@@ -93,6 +93,10 @@ public class UserServiceImpl implements UserService {
                 .token(jwtProvider.generateToken(userPrinciple))
                 .userName(userPrinciple.getUsername())
                 .roles(userPrinciple.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toSet()))
+                .email(userPrinciple.getUser().getEmail())
+                .phoneNumber(userPrinciple.getUser().getPhoneNumber())
+                .address(userPrinciple.getUser().getAddress())
+                .status(userPrinciple.getUser().getStatus())
                 .build();
     }
 
@@ -150,6 +154,25 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserResponseAllDTO findByIdd(Long id) throws CustomException {
+        User user = userRepository.findById(id).orElseThrow(() -> new CustomException("Not Found"));
+
+        Set<String> roleNames = user.getRoles().stream()
+                .map(Role::getName)
+                .collect(Collectors.toSet());
+
+        return UserResponseAllDTO
+                .builder()
+                .id(user.getId())
+                .userName(user.getUserName())
+                .roles(roleNames)
+                .email(user.getEmail())
+                .phoneNumber(user.getPhoneNumber())
+                .address(user.getAddress())
+                .build();
+    }
+
+    @Override
     public Page<UserResponseAllDTO> searchByName(Pageable pageable, String name) {
         Page<User> userPage = userRepository.findAllByUserNameContainingIgnoreCase(pageable, name);
         return userPage.map(UserResponseAllDTO::new);
@@ -191,5 +214,26 @@ public class UserServiceImpl implements UserService {
             throw new IllegalStateException("No authenticated user");
         }
         return (User) authentication.getPrincipal();
+    }
+
+    @Override
+    public boolean validateOldPassword(User user, String oldPassword) {
+        return passwordEncoder.matches(oldPassword, user.getPassword());
+    }
+
+    @Override
+    public void changePassword(User user, String newPassword) throws CustomException {
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+    }
+
+    @Override
+    public UserResponseAllDTO changeProfile(Long id, UserRequestDTO userRequestDTO) {
+        User user = userRepository.findById(id).orElse(null);
+        user.setUserName(userRequestDTO.getUserName());
+        user.setAddress(userRequestDTO.getAddress());
+        user.setPhoneNumber(userRequestDTO.getPhoneNumber());
+        userRepository.save(user);
+        return new UserResponseAllDTO(user);
     }
 }

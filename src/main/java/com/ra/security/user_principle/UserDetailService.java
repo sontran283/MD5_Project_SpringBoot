@@ -28,13 +28,10 @@ public class UserDetailService implements UserDetailsService {
         if (authentication == null) {
             return null;
         }
-
         Object principal = authentication.getPrincipal();
-
         if (principal instanceof UserPrinciple) {
             return ((UserPrinciple) principal).getUserId();
         }
-
         return null;
     }
 }

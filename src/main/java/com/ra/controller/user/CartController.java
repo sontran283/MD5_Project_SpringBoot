@@ -40,22 +40,31 @@ public class CartController {
     private UserRepository userRepository;
 
     // add to cart
-    @PostMapping("/add")
+    @PostMapping("/addToCart")
     public ResponseEntity<String> addToCart(@RequestBody AddtoCartRequestDTO addtoCartRequestDTO, Authentication authentication) throws UserNotFoundException, ProductNotFoundException {
         Long userId = userDetailService.getUserIdFromAuthentication(authentication);
         cartService.addToCart(userId, addtoCartRequestDTO);
         return new ResponseEntity<>("Product added to cart successfully", HttpStatus.OK);
     }
 
-    // list cart items
+    // index
     @GetMapping("/index")
-    public ResponseEntity<?> index() {
-        List<Cart_item> cartItemList = cartItemService.findAll();
-        if (cartItemList != null) {
-            return new ResponseEntity<>(cartItemList, HttpStatus.OK);
+    public ResponseEntity<?> index(Authentication authentication) {
+        try {
+            Long userId = userDetailService.getUserIdFromAuthentication(authentication);
+            User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
+
+            List<Cart_item> cartItemList = cartItemRepository.getCartItems(user.getId());
+            if (!cartItemList.isEmpty()) {
+                return new ResponseEntity<>(cartItemList, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("Cart is empty", HttpStatus.NOT_FOUND);
+            }
+        } catch (UserNotFoundException e) {
+            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>("NOT_FOUND", HttpStatus.NOT_FOUND);
     }
+
 
     // delete by ID
     @DeleteMapping("/delete/{id}")
@@ -75,23 +84,19 @@ public class CartController {
         return new ResponseEntity<>("Cart cleared successfully", HttpStatus.OK);
     }
 
-    // cart total
-    @GetMapping("/total")
-    public ResponseEntity<Double> getCartTotal(@ModelAttribute User user) {
-        Cart cart = cartService.getUserCart(user);
-        double cartTotal = cartService.cartTotal(user);
-        return new ResponseEntity<>(cartTotal, HttpStatus.OK);
-    }
-
     // check out
     @PostMapping("/checkout")
     public ResponseEntity<String> checkout(Authentication authentication) {
         try {
             Long userId = userDetailService.getUserIdFromAuthentication(authentication);
             User user = userRepository.findById(userId).orElse(null);
-            ordersService.checkout(user);
-            cartService.clearCart();
-            return new ResponseEntity<>("Checkout successful", HttpStatus.OK);
+            if (!user.getCart().getCartItems().isEmpty()) {
+                ordersService.checkout(user);
+                cartService.clearCart();
+                return new ResponseEntity<>("Checkout successful", HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("BAD_REQUEST", HttpStatus.BAD_REQUEST);
+            }
         } catch (Exception e) {
             return new ResponseEntity<>("Error during checkout: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }

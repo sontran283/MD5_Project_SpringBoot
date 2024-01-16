@@ -15,9 +15,8 @@ public class CartItemServiceImpl implements CartItemService {
     private CartItemRepository cartItemRepository;
 
     @Override
-    public List<Cart_item> findAll() {
-        List<Cart_item> cartList = cartItemRepository.findAll();
-        return cartList.stream().map(Cart_item::new).toList();
+    public List<Cart_item> findAll(User user) {
+        return cartItemRepository.getCartItems(user.getId());
     }
 
     @Override
