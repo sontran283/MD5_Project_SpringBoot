@@ -14,14 +14,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
-@CrossOrigin("*") // dung de truy cap moi duong dan ca noi bo, lan ngoai bo
 @RequestMapping("/admin")
 public class CategoryController {
     @Autowired
     private CategoryService categoryService;
+
 
     // sort-pagination
     @GetMapping("/category/sort-pagination")

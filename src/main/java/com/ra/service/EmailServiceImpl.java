@@ -16,7 +16,7 @@ public class EmailServiceImpl implements EmailService {
             SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
             simpleMailMessage.setFrom("jav2306@gmail.com");
             simpleMailMessage.setTo("tranhongson283@gmail.com");
-            simpleMailMessage.setText("Thank you for your purchase!!!");
+            simpleMailMessage.setText("Thank you for your purchase");
             simpleMailMessage.setSubject("COGO fresh fruit store");
             javaMailSender.send(simpleMailMessage);
             return "OK sent successfully";

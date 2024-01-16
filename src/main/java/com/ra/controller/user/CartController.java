@@ -2,10 +2,9 @@ package com.ra.controller.user;
 
 import com.ra.exception.ProductNotFoundException;
 import com.ra.exception.UserNotFoundException;
+import com.ra.model.dto.ICartItem;
 import com.ra.model.dto.request.AddtoCartRequestDTO;
-import com.ra.model.entity.Cart;
 import com.ra.model.entity.Cart_item;
-import com.ra.model.entity.Orders;
 import com.ra.model.entity.User;
 import com.ra.repository.CartItemRepository;
 import com.ra.repository.UserRepository;
@@ -18,7 +17,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/user")
@@ -34,6 +32,7 @@ public class CartController {
     @Autowired
     private UserRepository userRepository;
 
+
     // add to cart
     @PostMapping("/addToCart")
     public ResponseEntity<String> addToCart(@RequestBody AddtoCartRequestDTO addtoCartRequestDTO, Authentication authentication) throws UserNotFoundException, ProductNotFoundException {
@@ -42,6 +41,7 @@ public class CartController {
         return new ResponseEntity<>("Product added to cart successfully", HttpStatus.OK);
     }
 
+
     // index
     @GetMapping("/index")
     public ResponseEntity<?> index(Authentication authentication) {
@@ -49,7 +49,7 @@ public class CartController {
             Long userId = userDetailService.getUserIdFromAuthentication(authentication);
             User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
 
-            List<Cart_item> cartItemList = cartItemRepository.getCartItems(user.getId());
+            List<ICartItem> cartItemList = cartItemRepository.getCartItems1(user.getId());
             if (!cartItemList.isEmpty()) {
                 return new ResponseEntity<>(cartItemList, HttpStatus.OK);
             } else {
@@ -72,12 +72,14 @@ public class CartController {
         return new ResponseEntity<>("NOT_FOUND", HttpStatus.NOT_FOUND);
     }
 
+
     // clear All
     @DeleteMapping("/clearAll")
     public ResponseEntity<String> clearCart() {
         cartService.clearCart();
         return new ResponseEntity<>("Cart cleared successfully", HttpStatus.OK);
     }
+
 
     // check out
     @PostMapping("/checkout")

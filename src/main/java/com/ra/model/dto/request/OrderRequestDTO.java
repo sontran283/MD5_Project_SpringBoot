@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 @Data
 @Builder
 public class OrderRequestDTO {
+    private Long id;
     private String address;
     private String phone;
     private String note;
@@ -24,6 +25,7 @@ public class OrderRequestDTO {
     private int status;
 
     public OrderRequestDTO(Orders orders) {
+        this.id = orders.getId();
         this.address = orders.getAddress();
         this.phone = orders.getPhone();
         this.note = orders.getNote();

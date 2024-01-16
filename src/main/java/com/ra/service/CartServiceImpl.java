@@ -3,7 +3,6 @@ package com.ra.service;
 import com.ra.exception.ProductNotFoundException;
 import com.ra.exception.UserNotFoundException;
 import com.ra.model.dto.request.AddtoCartRequestDTO;
-import com.ra.model.dto.response.ProductResponseDTO;
 import com.ra.model.entity.Cart;
 import com.ra.model.entity.Cart_item;
 import com.ra.model.entity.Product;
@@ -12,7 +11,6 @@ import com.ra.repository.CartItemRepository;
 import com.ra.repository.CartRepository;
 import com.ra.repository.ProductRepository;
 import com.ra.repository.UserRepository;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

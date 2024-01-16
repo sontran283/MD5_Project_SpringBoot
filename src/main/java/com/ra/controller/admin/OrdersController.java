@@ -1,15 +1,8 @@
 package com.ra.controller.admin;
 
 import com.ra.exception.CustomException;
-import com.ra.model.dto.request.OrderRequestDTO;
 import com.ra.model.dto.response.OrderResponseDTO;
-import com.ra.model.entity.Cart_item;
-import com.ra.model.entity.Orders;
-import com.ra.model.entity.User;
-import com.ra.service.CartItemService;
-import com.ra.service.CartService;
 import com.ra.service.OrdersService;
-import com.ra.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,7 +10,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,48 +22,34 @@ public class OrdersController {
 
     // index
     @GetMapping("/orders/index")
-    public ResponseEntity<List<OrderResponseDTO>> getListOrders() {
-        List<OrderResponseDTO> ordersDTOList = ordersService.findAll();
-        return new ResponseEntity<>(ordersDTOList, HttpStatus.OK);
+    public ResponseEntity<List<OrderResponseDTO>> index() {
+        List<OrderResponseDTO> orderResponseDTO = ordersService.findAll();
+        return new ResponseEntity<>(orderResponseDTO, HttpStatus.OK);
     }
 
-    // add order
-    @PostMapping("/orders")
-    public ResponseEntity<OrderResponseDTO> createOrders(@RequestBody OrderRequestDTO orderRequestDTO) throws CustomException {
-        OrderResponseDTO newOrders = ordersService.saveOrUpdate(orderRequestDTO);
-        return new ResponseEntity<>(newOrders, HttpStatus.CREATED);
-    }
-
-    // delete order
-    @DeleteMapping("/orders/{id}")
-    public ResponseEntity<?> delete(@PathVariable("id") Long id) {
-        if (ordersService.findById(id) != null) {
-            ordersService.delete(id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    // orderById
+    @GetMapping("orders/{id}")
+    public ResponseEntity<?> orderById(@PathVariable("id") Long id) {
+        OrderResponseDTO orderResponseDTO = ordersService.findById(id);
+        if (orderResponseDTO != null) {
+            return new ResponseEntity<>(orderResponseDTO, HttpStatus.OK);
         }
         return new ResponseEntity<>("NOT_FOUND", HttpStatus.NOT_FOUND);
     }
 
-    @GetMapping("/orders/{id}")
-    public ResponseEntity<?> edit(@PathVariable("id") Long id) {
-        OrderResponseDTO idEdit = ordersService.findById(id);
-        if (idEdit != null) {
-            return new ResponseEntity<>(idEdit, HttpStatus.OK);
-        }
-        return new ResponseEntity<>("NOT_FOUND", HttpStatus.NOT_FOUND);
-    }
-
+    // changeStatus
     @PatchMapping("/orders/{id}")
-    public ResponseEntity<?> changeStatus(@PathVariable("id") Long id, @RequestBody OrderRequestDTO orderRequestDTO) throws CustomException {
-        OrderResponseDTO ordersDTO1 = ordersService.findById(id);
-        if (ordersDTO1 != null) {
-            ordersDTO1.setStatus(orderRequestDTO.getStatus());
-            ordersService.saveOrUpdate(orderRequestDTO);
-            return new ResponseEntity<>("Status updated successfully", HttpStatus.OK);
+    public ResponseEntity<?> changeStatus(@PathVariable("id") Long id, @RequestParam int status) throws CustomException {
+        try {
+            Long ChangeOrderId = Long.valueOf(id);
+            ordersService.changeStatus(ChangeOrderId, status);
+            return new ResponseEntity<>("Status changed", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("BAD_REQUEST", HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>("NOT_FOUND", HttpStatus.NOT_FOUND);
     }
 
+    // search-sort-pagination
     @GetMapping("/orders/search-sort-pagination")
     public ResponseEntity<Page<OrderResponseDTO>> getOrders(
             @RequestParam(name = "search") Integer id,

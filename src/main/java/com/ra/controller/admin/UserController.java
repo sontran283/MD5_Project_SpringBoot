@@ -56,6 +56,7 @@ public class UserController {
         return new ResponseEntity<>(userResponseAllDTOS, HttpStatus.OK);
     }
 
+    // index
     @GetMapping("/users")
     public ResponseEntity<Page<UserResponseAllDTO>> getListUser(Pageable pageable) throws CustomException {
         Page<UserResponseAllDTO> userResponseDTOList = userService.findAll(pageable);

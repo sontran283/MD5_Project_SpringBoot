@@ -55,7 +55,7 @@ public class ProductServiceImpl implements ProductService {
                 productNew.setImage(fileName);
             }
 
-            // Lấy category theo categoryId từ request DTO
+            // lấy category theo categoryId từ request DTO
             Category category = categoryRepository.findById(productDTO.getCategoryId()).orElse(null);
 
             // Set category cho product

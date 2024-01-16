@@ -3,14 +3,11 @@ package com.ra.controller.user;
 import com.ra.exception.CustomException;
 import com.ra.model.dto.request.ChangePasswordRequestDTO;
 import com.ra.model.dto.request.UserRequestDTO;
-import com.ra.model.dto.response.ProductResponseDTO;
 import com.ra.model.dto.response.UserResponseAllDTO;
-import com.ra.model.dto.response.UserResponseDTO;
 import com.ra.model.entity.User;
 import com.ra.repository.UserRepository;
 import com.ra.security.user_principle.UserDetailService;
 import com.ra.service.EmailService;
-import com.ra.service.ProductService;
 import com.ra.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/user")
