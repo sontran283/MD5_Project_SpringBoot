@@ -13,7 +13,6 @@ import java.util.List;
 
 
 public interface CartItemRepository extends JpaRepository<Cart_item, Long> {
-    Cart_item findByCart(Cart cart);
 
     Cart_item findAllByCartAndProduct(Cart cart, Product product);
 
@@ -24,6 +23,8 @@ public interface CartItemRepository extends JpaRepository<Cart_item, Long> {
     Cart_item findCart_itemById(Long id);
 
     List<Cart_item> findAllByCart_Id(Long id);
+    Cart_item findByCart(Cart cart);
+    List<Cart_item>findAllByCart(Cart cart);
 
     @Modifying
     @Query("SELECT ci.product FROM Cart_item ci WHERE ci.cart.user.id = :userId")

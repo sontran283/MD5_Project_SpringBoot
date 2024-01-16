@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Set;
 
 public interface OrdersService {
     List<OrderResponseDTO> findAll();
@@ -26,5 +27,5 @@ public interface OrdersService {
 
     Page<OrderResponseDTO> searchOrdersById(Pageable pageable, Integer id);
 
-    Orders checkout(User user, List<Cart_item> cartItems, Orders checkoutInfo);
+    void checkout(User user);
 }

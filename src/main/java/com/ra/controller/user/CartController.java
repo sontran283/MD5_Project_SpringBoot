@@ -8,6 +8,7 @@ import com.ra.model.entity.Cart_item;
 import com.ra.model.entity.Orders;
 import com.ra.model.entity.User;
 import com.ra.repository.CartItemRepository;
+import com.ra.repository.UserRepository;
 import com.ra.security.user_principle.UserDetailService;
 import com.ra.service.CartItemService;
 import com.ra.service.CartService;
@@ -20,6 +21,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/user")
@@ -35,7 +37,7 @@ public class CartController {
     @Autowired
     private OrdersService ordersService;
     @Autowired
-    private UserService userService;
+    private UserRepository userRepository;
 
     // add to cart
     @PostMapping("/add")
@@ -83,15 +85,13 @@ public class CartController {
 
     // check out
     @PostMapping("/checkout")
-    public ResponseEntity<String> checkout(@RequestBody Orders checkoutInfo, Authentication authentication) {
+    public ResponseEntity<String> checkout(Authentication authentication) {
         try {
-            User user = userService.getCurrentUser(authentication);
-            List<Cart_item> cartItems = cartItemService.getCartItems(user);
-
-            Orders orders = ordersService.checkout(user, cartItems, checkoutInfo);
-            // xóa các sản phẩm từ giỏ hàng sau khi Checkout
+            Long userId = userDetailService.getUserIdFromAuthentication(authentication);
+            User user = userRepository.findById(userId).orElse(null);
+            ordersService.checkout(user);
             cartService.clearCart();
-            return new ResponseEntity<>("Checkout successful. Order ID: " + orders.getId(), HttpStatus.OK);
+            return new ResponseEntity<>("Checkout successful", HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>("Error during checkout: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }

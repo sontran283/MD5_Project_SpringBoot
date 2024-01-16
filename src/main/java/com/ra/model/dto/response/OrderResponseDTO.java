@@ -1,6 +1,5 @@
 package com.ra.model.dto.response;
 
-import com.ra.model.dto.OrderDetailDTO;
 import com.ra.model.entity.OrderDetail;
 import com.ra.model.entity.Orders;
 import lombok.AllArgsConstructor;
@@ -8,7 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @AllArgsConstructor
@@ -21,7 +20,7 @@ public class OrderResponseDTO {
     private String phone;
     private String note;
     private float total;
-    private Date order_date;
+    private LocalDateTime order_date;
     private Long userId;
     private Set<OrderDetail> orderDetails;
     private int status;

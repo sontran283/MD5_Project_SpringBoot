@@ -4,18 +4,16 @@ import com.ra.exception.CustomException;
 import com.ra.model.dto.OrderDetailDTO;
 import com.ra.model.dto.request.OrderRequestDTO;
 import com.ra.model.dto.response.OrderResponseDTO;
-import com.ra.model.entity.Cart_item;
-import com.ra.model.entity.OrderDetail;
-import com.ra.model.entity.Orders;
-import com.ra.model.entity.User;
-import com.ra.repository.OrdersRepository;
-import com.ra.repository.UserRepository;
+import com.ra.model.entity.*;
+import com.ra.repository.*;
 import jakarta.persistence.criteria.Order;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -25,6 +23,12 @@ public class OrdersServiceImpl implements OrdersService {
     private OrdersRepository ordersRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private OrderDetailRepository orderDetailRepository;
+    @Autowired
+    private CartRepository cartRepository;
+    @Autowired
+    private CartItemRepository cartItemRepository;
 
     @Override
     public List<OrderResponseDTO> findAll() {
@@ -87,34 +91,36 @@ public class OrdersServiceImpl implements OrdersService {
     }
 
     @Override
-    public Orders checkout(User user, List<Cart_item> cartItems, Orders checkoutInfo) {
+    public void checkout(User user) {
+        Cart cart = cartRepository.findByUser(user);
+        List<Cart_item> cartItemList = cartItemRepository.findAllByCart(cart);
         // Tạo đối tượng Order mới
         Orders orders = new Orders();
         orders.setUser(user);
+        orders.setOrder_date(LocalDateTime.now());
+        ordersRepository.save(orders);
 
         // Tạo danh sách OrderItem từ danh sách Cart_item
-        List<OrderDetail> orderDetails = cartItems.stream().map(cartItem -> {
+        for (Cart_item cartItem : cartItemList) {
             OrderDetail orderDetail = new OrderDetail();
             orderDetail.setProduct(cartItem.getProduct());
             orderDetail.setQuantity(cartItem.getQuantity());
             orderDetail.setPrice(cartItem.getPrice());
             orderDetail.setOrders(orders);
-            return orderDetail;
-        }).collect(Collectors.toList());
-
-        orders.setOrderDetails((Set<OrderDetail>) orderDetails);
+            orderDetailRepository.save(orderDetail);
+        }
 
         // cập nhật thông tin đơn hàng từ request
-        orders.setAddress(checkoutInfo.getAddress());
-        orders.setPhone(checkoutInfo.getPhone());
-        orders.setNote(checkoutInfo.getNote());
+        orders.setAddress(user.getAddress());
+        orders.setPhone(user.getPhoneNumber());
+        orders.setNote(user.getEmail());
 
-        // tính tổng giá trị đơn hàng
-        float total = orderDetails.stream().map(orderDetail -> orderDetail.getPrice() * orderDetail.getQuantity()).reduce(Float::sum).orElse(0f);
+        // tính tổng
+        float total = cartItemList.stream().map(cartItem -> cartItem.getPrice() * cartItem.getQuantity()).reduce(Float::sum).orElse(0f);
         orders.setTotal(total);
 
         // lưu đơn hàng vào cơ sở dữ liệu
-        return ordersRepository.save(orders);
+        ordersRepository.save(orders);
     }
 
     private OrderResponseDTO mapToOrderResponseDTO(Orders orders) {
