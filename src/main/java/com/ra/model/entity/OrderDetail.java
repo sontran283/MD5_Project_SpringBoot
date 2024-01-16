@@ -15,10 +15,10 @@ public class OrderDetail {
     private Long id;
     private float price;
     private int quantity;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", referencedColumnName = "id")
     private Product product;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "orders_id", referencedColumnName = "id")
     private Orders orders;
 }

@@ -3,11 +3,10 @@ package com.ra.service;
 
 import com.ra.exception.CustomException;
 import com.ra.model.dto.request.UserRequestDTO;
-import com.ra.model.dto.response.ProductResponseDTO;
 import com.ra.model.dto.response.UserResponseAllDTO;
 import com.ra.model.dto.response.UserResponseDTO;
-import com.ra.model.entity.Role;
 import com.ra.model.entity.User;
+import org.springframework.security.core.Authentication;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -31,4 +30,6 @@ public interface UserService {
     void changeStatus(Long id) throws CustomException;
 
     void changeUserRole(Long id) throws CustomException;
+
+    User getCurrentUser(Authentication authentication);
 }

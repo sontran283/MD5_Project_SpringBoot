@@ -4,7 +4,6 @@ package com.ra.service;
 import com.ra.exception.CustomException;
 import com.ra.model.dto.request.UserRequestDTO;
 import com.ra.model.dto.response.*;
-import com.ra.model.entity.Product;
 import com.ra.model.entity.Role;
 import com.ra.model.entity.User;
 import com.ra.repository.UserRepository;
@@ -21,8 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
+
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -185,5 +183,13 @@ public class UserServiceImpl implements UserService {
                 .email(userResponseDTO.getEmail())
                 .password(user.getPassword())
                 .build());
+    }
+
+    @Override
+    public User getCurrentUser(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new IllegalStateException("No authenticated user");
+        }
+        return (User) authentication.getPrincipal();
     }
 }

@@ -3,20 +3,20 @@ package com.ra.controller.user;
 import com.ra.exception.ProductNotFoundException;
 import com.ra.exception.UserNotFoundException;
 import com.ra.model.dto.request.AddtoCartRequestDTO;
-import com.ra.model.dto.response.OrderResponseDTO;
 import com.ra.model.entity.Cart;
 import com.ra.model.entity.Cart_item;
-import com.ra.model.entity.Product;
+import com.ra.model.entity.Orders;
 import com.ra.model.entity.User;
 import com.ra.repository.CartItemRepository;
-import com.ra.repository.CartRepository;
 import com.ra.security.user_principle.UserDetailService;
+import com.ra.service.CartItemService;
 import com.ra.service.CartService;
+import com.ra.service.OrdersService;
+import com.ra.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,6 +30,12 @@ public class CartController {
     private UserDetailService userDetailService;
     @Autowired
     private CartItemRepository cartItemRepository;
+    @Autowired
+    private CartItemService cartItemService;
+    @Autowired
+    private OrdersService ordersService;
+    @Autowired
+    private UserService userService;
 
     // add to cart
     @PostMapping("/add")
@@ -41,9 +47,12 @@ public class CartController {
 
     // list cart items
     @GetMapping("/index")
-    public ResponseEntity<List<Cart_item>> getCartItems() {
-        List<Cart_item> cartItemList = cartService.findAll();
-        return new ResponseEntity<>(cartItemList, HttpStatus.OK);
+    public ResponseEntity<?> index() {
+        List<Cart_item> cartItemList = cartItemService.findAll();
+        if (cartItemList != null) {
+            return new ResponseEntity<>(cartItemList, HttpStatus.OK);
+        }
+        return new ResponseEntity<>("NOT_FOUND", HttpStatus.NOT_FOUND);
     }
 
     // delete by ID
@@ -66,9 +75,25 @@ public class CartController {
 
     // cart total
     @GetMapping("/total")
-    public ResponseEntity<Double> getCartTotal(@RequestParam User user) {
+    public ResponseEntity<Double> getCartTotal(@ModelAttribute User user) {
         Cart cart = cartService.getUserCart(user);
         double cartTotal = cartService.cartTotal(user);
         return new ResponseEntity<>(cartTotal, HttpStatus.OK);
+    }
+
+    // check out
+    @PostMapping("/checkout")
+    public ResponseEntity<String> checkout(@RequestBody Orders checkoutInfo, Authentication authentication) {
+        try {
+            User user = userService.getCurrentUser(authentication);
+            List<Cart_item> cartItems = cartItemService.getCartItems(user);
+
+            Orders orders = ordersService.checkout(user, cartItems, checkoutInfo);
+            // xóa các sản phẩm từ giỏ hàng sau khi Checkout
+            cartService.clearCart();
+            return new ResponseEntity<>("Checkout successful. Order ID: " + orders.getId(), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Error during checkout: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

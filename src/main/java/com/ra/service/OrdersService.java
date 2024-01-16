@@ -3,7 +3,9 @@ package com.ra.service;
 import com.ra.exception.CustomException;
 import com.ra.model.dto.request.OrderRequestDTO;
 import com.ra.model.dto.response.OrderResponseDTO;
+import com.ra.model.entity.Cart_item;
 import com.ra.model.entity.Orders;
+import com.ra.model.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -11,6 +13,8 @@ import java.util.List;
 
 public interface OrdersService {
     List<OrderResponseDTO> findAll();
+
+    Page<OrderResponseDTO> getAll(Pageable pageable);
 
     void delete(Long id);
 
@@ -22,5 +26,5 @@ public interface OrdersService {
 
     Page<OrderResponseDTO> searchOrdersById(Pageable pageable, Integer id);
 
-    Page<OrderResponseDTO> getAll(Pageable pageable);
+    Orders checkout(User user, List<Cart_item> cartItems, Orders checkoutInfo);
 }

@@ -21,12 +21,12 @@ public class Orders {
     private float total;
     private Date order_date;
     @Column(columnDefinition = "int default 1")
-    private int status=1;
+    private int status = 1;
 
-    @ManyToOne
+    @ManyToOne()
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
-    @OneToMany(mappedBy = "orders")
+    @OneToMany(mappedBy = "orders", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<OrderDetail> orderDetails;
 }

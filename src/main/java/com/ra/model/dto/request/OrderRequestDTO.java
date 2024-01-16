@@ -1,19 +1,13 @@
 package com.ra.model.dto.request;
 
-import com.ra.model.dto.OrderDetailDTO;
-import com.ra.model.entity.OrderDetail;
-import com.ra.model.entity.User;
-import jakarta.persistence.Column;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-import java.util.Set;
+import java.util.Date;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -24,7 +18,8 @@ public class OrderRequestDTO {
     private String phone;
     private String note;
     private float total;
-    private LocalDateTime order_date;
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "GMT")
+    private Date order_date;
     private Long userId;
     private int status;
 }
