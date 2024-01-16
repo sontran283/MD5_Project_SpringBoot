@@ -39,5 +39,5 @@ public interface UserService {
 
     void changePassword(User user, String newPassword) throws CustomException;
 
-    UserResponseAllDTO changeProfile(Long id, UserRequestDTO userRequestDTO);
+    UserResponseAllDTO changeProfile(Long id, UserRequestDTO userRequestDTO) throws CustomException;
 }

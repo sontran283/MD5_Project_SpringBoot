@@ -27,15 +27,9 @@ import java.util.List;
 public class OrdersController {
     @Autowired
     private OrdersService ordersService;
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private CartService cartService;
-    @Autowired
-    private CartItemService cartItemService;
 
     // index
-    @GetMapping("/orders")
+    @GetMapping("/orders/index")
     public ResponseEntity<List<OrderResponseDTO>> getListOrders() {
         List<OrderResponseDTO> ordersDTOList = ordersService.findAll();
         return new ResponseEntity<>(ordersDTOList, HttpStatus.OK);

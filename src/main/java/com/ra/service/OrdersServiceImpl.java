@@ -7,6 +7,7 @@ import com.ra.model.dto.response.OrderResponseDTO;
 import com.ra.model.entity.*;
 import com.ra.repository.*;
 import jakarta.persistence.criteria.Order;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -90,8 +91,9 @@ public class OrdersServiceImpl implements OrdersService {
         return ordersPage.map(this::mapToOrderResponseDTO);
     }
 
+    @Transactional
     @Override
-    public void checkout(User user) {
+    public Cart checkout(User user) {
         Cart cart = cartRepository.findByUser(user);
         List<Cart_item> cartItemList = cartItemRepository.findAllByCart(cart);
         // Tạo đối tượng Order mới
@@ -108,6 +110,7 @@ public class OrdersServiceImpl implements OrdersService {
             orderDetail.setPrice(cartItem.getPrice());
             orderDetail.setOrders(orders);
             orderDetailRepository.save(orderDetail);
+            cartItemRepository.deleteByCartItemId(cartItem.getId());
         }
 
         // cập nhật thông tin đơn hàng từ request
@@ -121,6 +124,7 @@ public class OrdersServiceImpl implements OrdersService {
 
         // lưu đơn hàng vào cơ sở dữ liệu
         ordersRepository.save(orders);
+        return cart;
     }
 
     private OrderResponseDTO mapToOrderResponseDTO(Orders orders) {

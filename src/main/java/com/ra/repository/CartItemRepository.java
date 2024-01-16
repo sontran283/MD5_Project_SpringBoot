@@ -3,6 +3,7 @@ package com.ra.repository;
 import com.ra.model.entity.Cart;
 import com.ra.model.entity.Cart_item;
 import com.ra.model.entity.Product;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -13,6 +14,10 @@ import java.util.List;
 
 
 public interface CartItemRepository extends JpaRepository<Cart_item, Long> {
+    @Transactional
+    @Modifying
+    @Query("DELETE FROM Cart_item ci WHERE ci.id = :Id")
+    void deleteByCartItemId(@Param("Id") Long Id);
 
     Cart_item findAllByCartAndProduct(Cart cart, Product product);
 

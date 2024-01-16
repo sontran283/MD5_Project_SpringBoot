@@ -73,7 +73,7 @@ public class HomeController {
 
     // change profile
     @PutMapping("/changeProfile")
-    public ResponseEntity<?> changeProfile(@ModelAttribute UserRequestDTO userRequestDTO, Authentication authentication) {
+    public ResponseEntity<?> changeProfile(@ModelAttribute UserRequestDTO userRequestDTO, Authentication authentication) throws CustomException {
         Long userId = userDetailService.getUserIdFromAuthentication(authentication);
         User user = userRepository.findById(userId).orElse(null);
         if (user != null) {
@@ -86,7 +86,7 @@ public class HomeController {
 
     // send Email
     @GetMapping("/sendEmail")
-    public ResponseEntity<?> testEmail() {
+    public ResponseEntity<?> test() {
         emailService.sendMail();
         return new ResponseEntity<>("OK", HttpStatus.OK);
     }

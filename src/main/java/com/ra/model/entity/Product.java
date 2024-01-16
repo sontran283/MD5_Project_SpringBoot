@@ -8,7 +8,8 @@ import java.util.Set;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
+@Getter
+@Setter
 @Builder
 @Entity
 public class Product {
@@ -27,5 +28,6 @@ public class Product {
     @JsonIgnore
     private Set<OrderDetail> orderDetail;
     @OneToOne(mappedBy = "product", fetch = FetchType.EAGER)
+    @JsonIgnore
     private Cart_item cartItem;
 }

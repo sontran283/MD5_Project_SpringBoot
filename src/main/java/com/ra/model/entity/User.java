@@ -1,7 +1,6 @@
 package com.ra.model.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.ra.model.dto.response.UserResponseDTO;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -9,7 +8,8 @@ import java.util.Set;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
+@Getter
+@Setter
 @Builder
 @Entity
 public class User {
@@ -25,13 +25,11 @@ public class User {
     @Column(columnDefinition = "Boolean default true")
     private Boolean status = true;
     @ManyToMany(fetch = FetchType.EAGER)
-
     @JoinTable(
             name = "user_role",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
-    @JsonIgnore
     private Set<Role> roles;
 
     @OneToOne(mappedBy = "user", fetch = FetchType.EAGER)

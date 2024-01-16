@@ -16,10 +16,10 @@ public class EmailServiceImpl implements EmailService {
             SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
             simpleMailMessage.setFrom("jav2306@gmail.com");
             simpleMailMessage.setTo("tranhongson283@gmail.com");
-            simpleMailMessage.setText("cam on ban da mua hang");
-            simpleMailMessage.setSubject("Cua hang hoa qua COGO");
+            simpleMailMessage.setText("Thank you for your purchase!!!");
+            simpleMailMessage.setSubject("COGO fresh fruit store");
             javaMailSender.send(simpleMailMessage);
-            return "OK da gui";
+            return "OK sent successfully";
         } catch (Exception e) {
             e.printStackTrace();
         }

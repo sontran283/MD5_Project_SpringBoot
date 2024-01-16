@@ -10,10 +10,7 @@ import com.ra.model.entity.User;
 import com.ra.repository.CartItemRepository;
 import com.ra.repository.UserRepository;
 import com.ra.security.user_principle.UserDetailService;
-import com.ra.service.CartItemService;
-import com.ra.service.CartService;
-import com.ra.service.OrdersService;
-import com.ra.service.UserService;
+import com.ra.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,8 +29,6 @@ public class CartController {
     private UserDetailService userDetailService;
     @Autowired
     private CartItemRepository cartItemRepository;
-    @Autowired
-    private CartItemService cartItemService;
     @Autowired
     private OrdersService ordersService;
     @Autowired
@@ -92,7 +87,6 @@ public class CartController {
             User user = userRepository.findById(userId).orElse(null);
             if (!user.getCart().getCartItems().isEmpty()) {
                 ordersService.checkout(user);
-                cartService.clearCart();
                 return new ResponseEntity<>("Checkout successful", HttpStatus.OK);
             } else {
                 return new ResponseEntity<>("BAD_REQUEST", HttpStatus.BAD_REQUEST);

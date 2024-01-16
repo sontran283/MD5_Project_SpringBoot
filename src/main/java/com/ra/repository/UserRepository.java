@@ -21,6 +21,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Boolean existsByPhoneNumber(String phoneNumber);
 
+    Boolean existsByAddress(String address);
+
     @Modifying
     @Query("update User u set u.status=case when u.status=true then false else true end where u.id=?1")
     void changeStatus(Long id);

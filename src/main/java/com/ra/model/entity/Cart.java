@@ -8,7 +8,8 @@ import java.util.Set;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
+@Getter
+@Setter
 @Builder
 @Entity
 public class Cart {
@@ -24,9 +25,9 @@ public class Cart {
     @JsonIgnore
     private Set<Cart_item> cartItems;
 
-    public Cart(Cart cart) {
-        this.id = cart.getId();
-        this.user = cart.getUser();
-        this.cartItems = cart.getCartItems();
-    }
+//    public Cart(Cart cart) {
+//        this.id = cart.getId();
+//        this.user = cart.getUser();
+//        this.cartItems = cart.getCartItems();
+//    }
 }
