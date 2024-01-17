@@ -2,7 +2,9 @@ package com.ra.controller.admin;
 
 import com.ra.exception.CustomException;
 import com.ra.model.dto.request.ProductRequestDTO;
+import com.ra.model.dto.response.CategoryResponseDTO;
 import com.ra.model.dto.response.ProductResponseDTO;
+import com.ra.service.CategoryService;
 import com.ra.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -19,6 +21,8 @@ import org.springframework.data.domain.Page;
 public class ProductController {
     @Autowired
     private ProductService productService;
+    @Autowired
+    private CategoryService categoryService;
 
     // sort-pagination
     @GetMapping("/products/sort-pagination")
@@ -57,10 +61,19 @@ public class ProductController {
 
     // add
     @PostMapping("/products")
-    public ResponseEntity<ProductResponseDTO> createProduct(@ModelAttribute ProductRequestDTO productRequestDTO) throws CustomException {
-        ProductResponseDTO newProduct = productService.saveOrUpdate(productRequestDTO);
-        return new ResponseEntity<>(newProduct, HttpStatus.CREATED);
+    public ResponseEntity<?> createProduct(@ModelAttribute ProductRequestDTO productRequestDTO) throws CustomException {
+        // kiểm tra xem danh mục có tồn tại và đang ở trạng thái true không
+        Long categoryId = productRequestDTO.getCategoryId();
+        CategoryResponseDTO categoryResponseDTO = categoryService.findById(categoryId);
+
+        if (categoryResponseDTO != null && categoryResponseDTO.getStatus()) {
+            ProductResponseDTO newProduct = productService.saveOrUpdate(productRequestDTO);
+            return new ResponseEntity<>(newProduct, HttpStatus.CREATED);
+        } else {
+            return new ResponseEntity<>("The category is invalid or does not exist", HttpStatus.BAD_REQUEST);
+        }
     }
+
 
     // edit
     @GetMapping("/products/{id}")

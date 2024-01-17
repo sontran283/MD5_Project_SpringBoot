@@ -13,29 +13,32 @@ import java.util.Collection;
 @Setter
 @Builder
 public class UserPrinciple implements UserDetails {
-    private User user;
+    private User user;  // Đối tượng User chứa thông tin chi tiết về người dùng.
 
-    private Collection<? extends GrantedAuthority> authorities;
+    private Collection<? extends GrantedAuthority> authorities; // authorities: Danh sách các quyền được cấp phép cho người dùng.
 
     public Long getUserId() {
         return user.getId();
-    }
+    }  // Phương thức trả về userId từ đối tượng User.
 
-    @Override
+    @Override  // getAuthorities: Trả về danh sách các quyền được cấp phép cho người dùng.
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return authorities;
     }
 
-    @Override
+    @Override // getPassword: Trả về mật khẩu của người dùng.
     public String getPassword() {
         return user.getPassword();
     }
 
-    @Override
+    @Override // getUsername: Trả về tên đăng nhập của người dùng.
     public String getUsername() {
         return user.getUserName();
     }
 
+
+    // Trả về giá trị true cho tất cả các phương thức này, đánh dấu rằng tài khoản không hết hạn,
+    // không bị khóa, thông tin xác thực không hết hạn, và tài khoản được bật.
     @Override
     public boolean isAccountNonExpired() {
         return true;

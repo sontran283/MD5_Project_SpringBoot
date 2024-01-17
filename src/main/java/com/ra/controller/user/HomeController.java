@@ -4,12 +4,15 @@ import com.ra.exception.CustomException;
 import com.ra.model.dto.request.ChangePasswordRequestDTO;
 import com.ra.model.dto.request.UserRequestDTO;
 import com.ra.model.dto.response.OrderResponseDTO;
+import com.ra.model.dto.response.ProductResponseDTO;
 import com.ra.model.dto.response.UserResponseAllDTO;
+import com.ra.model.entity.Product;
 import com.ra.model.entity.User;
 import com.ra.repository.UserRepository;
 import com.ra.security.user_principle.UserDetailService;
 import com.ra.service.EmailService;
 import com.ra.service.OrdersService;
+import com.ra.service.ProductService;
 import com.ra.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,8 +27,6 @@ import java.util.List;
 @RequestMapping("/user")
 public class HomeController {
     @Autowired
-    private EmailService emailService;
-    @Autowired
     private UserService userService;
     @Autowired
     private UserDetailService userDetailService;
@@ -33,6 +34,16 @@ public class HomeController {
     private UserRepository userRepository;
     @Autowired
     private OrdersService ordersService;
+    @Autowired
+    private ProductService productService;
+
+    // index
+    @GetMapping("/getListProductIndex")
+    public ResponseEntity<?> getListProductIndex() {
+        List<ProductResponseDTO> productList = productService.findAll();
+        List<ProductResponseDTO> filteredProducts = productList.stream().filter(ProductResponseDTO::getStatus).toList();
+        return new ResponseEntity<>(filteredProducts, HttpStatus.OK);
+    }
 
 
     // order history
@@ -98,12 +109,4 @@ public class HomeController {
         }
         return new ResponseEntity<>("NOT_FOUND", HttpStatus.NOT_FOUND);
     }
-
-
-    // send Email
-//    @GetMapping("/sendEmail")
-//    public ResponseEntity<?> test() {
-//        emailService.sendMail();
-//        return new ResponseEntity<>("OK", HttpStatus.OK);
-//    }
 }

@@ -14,7 +14,8 @@ import java.util.Map;
 
 @RestControllerAdvice
 // đánh dấu là một Advice (một component của Spring) được sử dụng để xử lý các exception trong ứng dụng
-public class ApplicationHandler { // xử lý các exception cho các controller trong ứng dụng
+// xử lý các exception cho các controller trong ứng dụng
+public class ApplicationHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> invalidRequest(MethodArgumentNotValidException e) {
         // tạo một Map để lưu trữ các lỗi từ BindingResult
@@ -25,8 +26,9 @@ public class ApplicationHandler { // xử lý các exception cho các controller
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(CustomException.class)  //  annotation này sẽ được sử dụng để xử lý một loại exception cụ thể
+    // annotation này sẽ được sử dụng để xử lý một loại exception cụ thể
     // khi một CustomException được ném ra trong ứng dụng, phương thức này sẽ được gọi để xử lý exception đó
+    @ExceptionHandler(CustomException.class)
     public ResponseEntity<String> customException(CustomException e) {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
     }

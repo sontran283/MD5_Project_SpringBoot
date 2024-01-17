@@ -15,6 +15,11 @@ public class UserDetailService implements UserDetailsService {
     @Autowired
     private UserRepository userRepository;
 
+
+    // Phương thức này được override từ UserDetailsService. Nó được gọi khi Spring Security cần thông tin chi tiết về người dùng để xác thực.
+    // Sử dụng userRepository để lấy thông tin người dùng từ cơ sở dữ liệu dựa trên tên đăng nhập (username).
+    // Tạo một đối tượng UserPrinciple (implements UserDetails) để lưu trữ thông tin về người dùng.
+    // Gán danh sách quyền (roles) của người dùng vào authorities của UserPrinciple.
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUserName(username);
@@ -24,6 +29,10 @@ public class UserDetailService implements UserDetailsService {
         return userPrinciple;
     }
 
+
+    // Phương thức này nhận Authentication từ Spring Security và trích xuất userId từ đối tượng UserPrinciple.
+    // Nếu Authentication không tồn tại hoặc đối tượng người dùng không phải là UserPrinciple, nó trả về null.
+    // Nếu Authentication và đối tượng người dùng là UserPrinciple, nó trả về userId.
     public Long getUserIdFromAuthentication(Authentication authentication) {
         if (authentication == null) {
             return null;

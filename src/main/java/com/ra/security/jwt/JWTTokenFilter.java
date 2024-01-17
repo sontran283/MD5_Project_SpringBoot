@@ -25,6 +25,11 @@ public class JWTTokenFilter extends OncePerRequestFilter {
     private UserDetailsService userDetailsService;
     private final Logger logger= LoggerFactory.getLogger(JWTEntryPoint.class);
 
+
+    // Phương thức doFilterInternal được override từ OncePerRequestFilter. Nó được gọi mỗi lần một request đi qua filter.
+    // Kiểm tra xem request có chứa token và token đó có hợp lệ không bằng cách sử dụng jwtProvider.validateToken.
+    // Nếu token hợp lệ, trích xuất tên người dùng từ token và tải thông tin chi tiết của người dùng thông qua userDetailsService.
+    // Nếu thông tin chi tiết của người dùng tồn tại, tạo một đối tượng UsernamePasswordAuthenticationToken và đặt nó vào SecurityContextHolder.
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try{
@@ -46,6 +51,9 @@ public class JWTTokenFilter extends OncePerRequestFilter {
         filterChain.doFilter(request,response);
     }
 
+
+    // Phương thức này trích xuất token từ header của request.
+    // Header được kiểm tra có bắt đầu bằng chuỗi "Bearer " hay không.
     public String getTokenFromRequest(HttpServletRequest request) {
         String header = request.getHeader("Authorization");
         if (header != null && header.startsWith("Bearer ")) {

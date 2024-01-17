@@ -71,7 +71,6 @@ public class OrdersController {
             @RequestParam(name = "order", defaultValue = "asc") String order,
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "3") int size) {
-
         Pageable pageable;
         if (order.equals("asc")) {
             pageable = PageRequest.of(page, size, Sort.by(sort).ascending());
