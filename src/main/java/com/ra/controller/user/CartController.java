@@ -4,6 +4,7 @@ import com.ra.exception.ProductNotFoundException;
 import com.ra.exception.UserNotFoundException;
 import com.ra.model.dto.ICartItem;
 import com.ra.model.dto.request.AddtoCartRequestDTO;
+import com.ra.model.dto.response.OrderResponseDTO;
 import com.ra.model.entity.Cart_item;
 import com.ra.model.entity.User;
 import com.ra.repository.CartItemRepository;
@@ -48,7 +49,6 @@ public class CartController {
         try {
             Long userId = userDetailService.getUserIdFromAuthentication(authentication);
             User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
-
             List<ICartItem> cartItemList = cartItemRepository.getCartItems1(user.getId());
             if (!cartItemList.isEmpty()) {
                 return new ResponseEntity<>(cartItemList, HttpStatus.OK);

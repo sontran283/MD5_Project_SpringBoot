@@ -2,6 +2,7 @@ package com.ra.controller.admin;
 
 import com.ra.exception.CustomException;
 import com.ra.model.dto.response.OrderResponseDTO;
+import com.ra.model.entity.Orders;
 import com.ra.service.OrdersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -48,6 +49,14 @@ public class OrdersController {
             return new ResponseEntity<>("BAD_REQUEST", HttpStatus.BAD_REQUEST);
         }
     }
+
+    // get ListOrderByStatus
+    @GetMapping("/orders/ListOrderByStatus")
+    public ResponseEntity<?> ListOrderByStatus(@RequestParam Integer status) {
+        List<OrderResponseDTO> ordersList = ordersService.getListOrderByStatus(status);
+        return new ResponseEntity<>(ordersList, HttpStatus.OK);
+    }
+
 
     // search-sort-pagination
     @GetMapping("/orders/search-sort-pagination")

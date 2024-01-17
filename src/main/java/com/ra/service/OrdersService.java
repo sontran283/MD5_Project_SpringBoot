@@ -28,4 +28,6 @@ public interface OrdersService {
     void checkout(User user);
 
     void changeStatus(Long id, int status);
+
+    List<OrderResponseDTO> getListOrderByStatus(Integer status);
 }

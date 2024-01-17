@@ -120,4 +120,10 @@ public class OrdersServiceImpl implements OrdersService {
         orders.setStatus(status);
         ordersRepository.save(orders);
     }
+
+    @Override
+    public List<OrderResponseDTO> getListOrderByStatus(Integer status) {
+        List<Orders> ordersList = ordersRepository.findAllByStatus(status);
+        return ordersList.stream().map(OrderResponseDTO::new).toList();
+    }
 }
