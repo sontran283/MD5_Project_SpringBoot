@@ -1,6 +1,7 @@
 package com.ra.service;
 
 import com.ra.exception.CustomException;
+import com.ra.exception.OrderNotFoundException;
 import com.ra.model.dto.request.OrderRequestDTO;
 import com.ra.model.dto.response.OrderResponseDTO;
 import com.ra.model.entity.Orders;
@@ -25,9 +26,11 @@ public interface OrdersService {
 
     Page<OrderResponseDTO> searchOrdersById(Pageable pageable, Integer id);
 
-    void checkout(User user);
+    Orders checkout(User user);
 
-    void changeStatus(Long id, int status);
+    void changeStatus(Long id, int status) throws OrderNotFoundException;
 
     List<OrderResponseDTO> getListOrderByStatus(Integer status);
+
+    List<OrderResponseDTO> getListOrderByUser(User user);
 }

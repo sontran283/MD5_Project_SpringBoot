@@ -1,6 +1,7 @@
 package com.ra.service;
 
 import com.ra.exception.CustomException;
+import com.ra.exception.OrderNotFoundException;
 import com.ra.model.dto.request.OrderRequestDTO;
 import com.ra.model.dto.response.OrderResponseDTO;
 import com.ra.model.entity.*;
@@ -81,7 +82,7 @@ public class OrdersServiceImpl implements OrdersService {
 
     @Transactional
     @Override
-    public void checkout(User user) {
+    public Orders checkout(User user) {
         Cart cart = cartRepository.findByUser(user);
         List<Cart_item> cartItemList = cartItemRepository.findAllByCart(cart);
         // tạo đối tượng Order mới
@@ -112,18 +113,33 @@ public class OrdersServiceImpl implements OrdersService {
 
         // lưu đơn hàng vào cơ sở dữ liệu
         ordersRepository.save(orders);
+        return orders;
     }
 
     @Override
-    public void changeStatus(Long id, int status) {
-        Orders orders = ordersRepository.findById(id).orElse(null);
-        orders.setStatus(status);
-        ordersRepository.save(orders);
+    public void changeStatus(Long id, int status) throws OrderNotFoundException {
+        Orders orders = ordersRepository.findById(id).orElseThrow(() -> new OrderNotFoundException("NOT_FOUND"));
+        if (orders.getStatus() == 0) {
+            throw new OrderNotFoundException("Order has been CONFIRM, status cannot be changed");
+        }
+        if (orders.getStatus() == 2) {
+            throw new OrderNotFoundException("Order has been CANCEL, status cannot be changed");
+        }
+        if (orders.getStatus() == 1) {
+            orders.setStatus(status);
+            ordersRepository.save(orders);
+        }
     }
 
     @Override
     public List<OrderResponseDTO> getListOrderByStatus(Integer status) {
         List<Orders> ordersList = ordersRepository.findAllByStatus(status);
+        return ordersList.stream().map(OrderResponseDTO::new).toList();
+    }
+
+    @Override
+    public List<OrderResponseDTO> getListOrderByUser(User user) {
+        List<Orders> ordersList = ordersRepository.findByUser(user);
         return ordersList.stream().map(OrderResponseDTO::new).toList();
     }
 }

@@ -1,6 +1,7 @@
 package com.ra.controller.admin;
 
 import com.ra.exception.CustomException;
+import com.ra.exception.OrderNotFoundException;
 import com.ra.model.dto.response.OrderResponseDTO;
 import com.ra.model.entity.Orders;
 import com.ra.service.OrdersService;
@@ -40,12 +41,16 @@ public class OrdersController {
 
     // changeStatus
     @PatchMapping("/orders/{id}")
-    public ResponseEntity<?> changeStatus(@PathVariable("id") Long id, @RequestParam int status) throws CustomException {
+    public ResponseEntity<?> changeStatus(@PathVariable("id") Long id, @RequestParam String status) throws CustomException, OrderNotFoundException {
         try {
+            int orderStatus = Integer.parseInt(status);
             Long ChangeOrderId = Long.valueOf(id);
-            ordersService.changeStatus(ChangeOrderId, status);
+            if (orderStatus < 0 || orderStatus > 2) {
+                throw new NumberFormatException("Invalid order status");
+            }
+            ordersService.changeStatus(ChangeOrderId, orderStatus);
             return new ResponseEntity<>("Status changed", HttpStatus.OK);
-        } catch (Exception e) {
+        } catch (NumberFormatException e) {
             return new ResponseEntity<>("BAD_REQUEST", HttpStatus.BAD_REQUEST);
         }
     }

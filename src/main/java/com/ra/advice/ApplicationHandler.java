@@ -1,6 +1,7 @@
 package com.ra.advice;
 
 import com.ra.exception.CustomException;
+import com.ra.exception.OrderNotFoundException;
 import com.ra.exception.UserNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,7 +12,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.HashMap;
 import java.util.Map;
 
-@RestControllerAdvice // đánh dấu là một Advice (một component của Spring) được sử dụng để xử lý các exception trong ứng dụng
+@RestControllerAdvice
+// đánh dấu là một Advice (một component của Spring) được sử dụng để xử lý các exception trong ứng dụng
 public class ApplicationHandler { // xử lý các exception cho các controller trong ứng dụng
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> invalidRequest(MethodArgumentNotValidException e) {
@@ -28,8 +30,14 @@ public class ApplicationHandler { // xử lý các exception cho các controller
     public ResponseEntity<String> customException(CustomException e) {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
     }
+
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<String> UserNotFoundException(UserNotFoundException e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(OrderNotFoundException.class)
+    public ResponseEntity<String> OrderNotFoundException(OrderNotFoundException e) {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
     }
 }

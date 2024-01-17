@@ -6,6 +6,7 @@ import com.ra.model.dto.ICartItem;
 import com.ra.model.dto.request.AddtoCartRequestDTO;
 import com.ra.model.dto.response.OrderResponseDTO;
 import com.ra.model.entity.Cart_item;
+import com.ra.model.entity.Orders;
 import com.ra.model.entity.User;
 import com.ra.repository.CartItemRepository;
 import com.ra.repository.UserRepository;
@@ -32,14 +33,22 @@ public class CartController {
     private OrdersService ordersService;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private EmailService emailService;
 
 
     // add to cart
     @PostMapping("/addToCart")
-    public ResponseEntity<String> addToCart(@RequestBody AddtoCartRequestDTO addtoCartRequestDTO, Authentication authentication) throws UserNotFoundException, ProductNotFoundException {
-        Long userId = userDetailService.getUserIdFromAuthentication(authentication);
-        cartService.addToCart(userId, addtoCartRequestDTO);
-        return new ResponseEntity<>("Product added to cart successfully", HttpStatus.OK);
+    public ResponseEntity<String> addToCart(@RequestBody AddtoCartRequestDTO addtoCartRequestDTO, Authentication authentication) {
+        try {
+            Long userId = userDetailService.getUserIdFromAuthentication(authentication);
+            cartService.addToCart(userId, addtoCartRequestDTO);
+            return new ResponseEntity<>("Product added to cart successfully", HttpStatus.OK);
+        } catch (UserNotFoundException e) {
+            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+        } catch (ProductNotFoundException e) {
+            return new ResponseEntity<>("Product not found. Please enter a valid product code.", HttpStatus.NOT_FOUND);
+        }
     }
 
 
@@ -88,7 +97,8 @@ public class CartController {
             Long userId = userDetailService.getUserIdFromAuthentication(authentication);
             User user = userRepository.findById(userId).orElse(null);
             if (!user.getCart().getCartItems().isEmpty()) {
-                ordersService.checkout(user);
+                Orders orders = ordersService.checkout(user);
+                emailService.sendMail(user, orders);
                 return new ResponseEntity<>("Checkout successful", HttpStatus.OK);
             } else {
                 return new ResponseEntity<>("BAD_REQUEST", HttpStatus.BAD_REQUEST);

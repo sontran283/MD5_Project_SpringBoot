@@ -3,17 +3,21 @@ package com.ra.controller.user;
 import com.ra.exception.CustomException;
 import com.ra.model.dto.request.ChangePasswordRequestDTO;
 import com.ra.model.dto.request.UserRequestDTO;
+import com.ra.model.dto.response.OrderResponseDTO;
 import com.ra.model.dto.response.UserResponseAllDTO;
 import com.ra.model.entity.User;
 import com.ra.repository.UserRepository;
 import com.ra.security.user_principle.UserDetailService;
 import com.ra.service.EmailService;
+import com.ra.service.OrdersService;
 import com.ra.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @RestController
@@ -27,6 +31,22 @@ public class HomeController {
     private UserDetailService userDetailService;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private OrdersService ordersService;
+
+
+    // order history
+    @GetMapping("/history")
+    public ResponseEntity<?> history(Authentication authentication) {
+        Long userId = userDetailService.getUserIdFromAuthentication(authentication);
+        User user = userRepository.findById(userId).orElse(null);
+        if (user != null) {
+            List<OrderResponseDTO> orderResponseDTO = ordersService.getListOrderByUser(user);
+            return new ResponseEntity<>(orderResponseDTO, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+        }
+    }
 
 
     // get userById
@@ -81,9 +101,9 @@ public class HomeController {
 
 
     // send Email
-    @GetMapping("/sendEmail")
-    public ResponseEntity<?> test() {
-        emailService.sendMail();
-        return new ResponseEntity<>("OK", HttpStatus.OK);
-    }
+//    @GetMapping("/sendEmail")
+//    public ResponseEntity<?> test() {
+//        emailService.sendMail();
+//        return new ResponseEntity<>("OK", HttpStatus.OK);
+//    }
 }
