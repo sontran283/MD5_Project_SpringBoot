@@ -2,6 +2,7 @@ package com.ra.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
 
 import java.util.Set;
@@ -27,7 +28,7 @@ public class Product {
     @OneToMany(mappedBy = "product")
     @JsonIgnore
     private Set<OrderDetail> orderDetail;
-    @OneToOne(mappedBy = "product", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "product", fetch = FetchType.EAGER)
     @JsonIgnore
-    private Cart_item cartItem;
+    private Set<Cart_item> cartItem;
 }

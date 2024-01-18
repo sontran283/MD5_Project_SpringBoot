@@ -1,12 +1,14 @@
 package com.ra.service;
 
 import com.ra.exception.CustomException;
+import com.ra.exception.ProductException;
 import com.ra.model.dto.request.ProductRequestDTO;
 import com.ra.model.dto.response.ProductResponseDTO;
 import com.ra.model.entity.Category;
 import com.ra.model.entity.Product;
 import com.ra.repository.CategoryRepository;
 import com.ra.repository.ProductRepository;
+import io.micrometer.common.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -39,11 +41,23 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponseDTO saveOrUpdate(ProductRequestDTO productDTO) throws CustomException {
+    public ProductResponseDTO saveOrUpdate(ProductRequestDTO productDTO) throws ProductException {
         // check da ton tai
         if (categoryRepository.existsByCategoryName(productDTO.getName())) {
-            throw new CustomException("productName already exists!");
+            throw new ProductException("productName already exists!");
         }
+
+        // check trường hợp trống trường dữ liệu
+        if (StringUtils.isBlank(productDTO.getName()) || productDTO.getPrice() == null || productDTO.getCategoryId() == null) {
+            throw new ProductException("Product name, price, categoryId is required");
+        }
+
+        // check trường hợp trống trường file
+        MultipartFile file = productDTO.getFile();
+        if (file == null || file.isEmpty()) {
+            throw new ProductException("Product image is required");
+        }
+
         if (productDTO.getId() == null) {
             Product productNew = new Product();
             productNew.setName(productDTO.getName());

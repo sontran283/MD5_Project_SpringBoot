@@ -21,7 +21,7 @@ public interface CartService {
 
     void removeFromCart(Long id);
 
-    void clearCart();
+    void clearCart(Long id);
 
     double cartTotal(User user);
 }

@@ -1,11 +1,13 @@
 package com.ra.controller.admin;
 
 import com.ra.exception.CustomException;
+import com.ra.exception.ProductException;
 import com.ra.model.dto.request.ProductRequestDTO;
 import com.ra.model.dto.response.CategoryResponseDTO;
 import com.ra.model.dto.response.ProductResponseDTO;
 import com.ra.service.CategoryService;
 import com.ra.service.ProductService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -61,7 +63,7 @@ public class ProductController {
 
     // add
     @PostMapping("/products")
-    public ResponseEntity<?> createProduct(@ModelAttribute ProductRequestDTO productRequestDTO) throws CustomException {
+    public ResponseEntity<?> createProduct(@ModelAttribute ProductRequestDTO productRequestDTO) throws ProductException {
         // kiểm tra xem danh mục có tồn tại và đang ở trạng thái true không
         Long categoryId = productRequestDTO.getCategoryId();
         CategoryResponseDTO categoryResponseDTO = categoryService.findById(categoryId);
@@ -87,7 +89,7 @@ public class ProductController {
 
     // update
     @PutMapping("/products/{id}")
-    public ResponseEntity<?> updateProduct(@PathVariable("id") Long id, @ModelAttribute ProductRequestDTO productRequestDTO) throws CustomException {
+    public ResponseEntity<?> updateProduct(@PathVariable("id") Long id, @ModelAttribute ProductRequestDTO productRequestDTO) throws ProductException {
         ProductResponseDTO updatedProductRequest = productService.findById(id);
         productRequestDTO.setId(updatedProductRequest.getId());
         ProductResponseDTO updatedProduct = productService.saveOrUpdate(productRequestDTO);
@@ -104,7 +106,7 @@ public class ProductController {
 
     // delete
     @DeleteMapping("/products/{id}")
-    public ResponseEntity<?> deleteProduct(@PathVariable("id") Long id) throws CustomException {
+    public ResponseEntity<?> deleteProduct(@PathVariable("id") Long id) throws ProductException, CustomException {
         if (productService.findProductById(id) != null) {
             productService.delete(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);

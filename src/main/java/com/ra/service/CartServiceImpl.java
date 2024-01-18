@@ -76,8 +76,12 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public void clearCart() {
-        cartItemRepository.deleteAll();
+    public void clearCart(Long id) {
+        User user = userRepository.findById(id).orElse(null);
+        Cart cart = cartRepository.findByUser(user);
+        if (cart != null) {
+            cartItemRepository.deleteCartItemByCartId(cart.getId());
+        }
     }
 
     @Override

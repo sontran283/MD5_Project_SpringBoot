@@ -89,8 +89,9 @@ public class CartController {
 
     // clear All
     @DeleteMapping("/clearAll")
-    public ResponseEntity<String> clearCart() {
-        cartService.clearCart();
+    public ResponseEntity<String> clearCart(Authentication authentication) {
+        Long userId = userDetailService.getUserIdFromAuthentication(authentication);
+        cartService.clearCart(userId);
         return new ResponseEntity<>("Cart cleared successfully", HttpStatus.OK);
     }
 

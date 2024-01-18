@@ -1,6 +1,7 @@
 package com.ra.service;
 
 import com.ra.exception.CustomException;
+import com.ra.exception.ProductException;
 import com.ra.model.dto.request.ProductRequestDTO;
 import com.ra.model.dto.response.ProductResponseDTO;
 import com.ra.model.entity.Product;
@@ -14,7 +15,7 @@ public interface ProductService {
 
     void delete(Long id);
 
-    ProductResponseDTO saveOrUpdate(ProductRequestDTO product) throws CustomException;
+    ProductResponseDTO saveOrUpdate(ProductRequestDTO product) throws ProductException;
 
     ProductResponseDTO findById(Long id);
 

@@ -1,8 +1,6 @@
 package com.ra.advice;
 
-import com.ra.exception.CustomException;
-import com.ra.exception.OrderNotFoundException;
-import com.ra.exception.UserNotFoundException;
+import com.ra.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -40,6 +38,16 @@ public class ApplicationHandler {
 
     @ExceptionHandler(OrderNotFoundException.class)
     public ResponseEntity<String> OrderNotFoundException(OrderNotFoundException e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(CategoryException.class)
+    public ResponseEntity<String> CategoryException(CategoryException e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(ProductException.class)
+    public ResponseEntity<String> ProductException(ProductException e) {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
     }
 }

@@ -1,10 +1,12 @@
 package com.ra.service;
 
 import com.ra.exception.CustomException;
+import com.ra.exception.ProductException;
 import com.ra.model.dto.request.CategoryRequestDTO;
 import com.ra.model.dto.response.CategoryResponseDTO;
 import com.ra.model.entity.Category;
 import com.ra.repository.CategoryRepository;
+import io.micrometer.common.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -35,6 +37,12 @@ public class CategoryServiceImpl implements CategoryService {
         if (categoryRepository.existsByCategoryName(categoryDTO.getCategoryName())) {
             throw new CustomException("categoryName already exists!");
         }
+
+        // Kiểm tra trường hợp trống trường dữ liệu
+        if (StringUtils.isBlank(categoryDTO.getCategoryName())) {
+            throw new CustomException("CategoryName is required");
+        }
+
         if (categoryDTO.getId() == null) {
             category = new Category();
             category.setCategoryName(categoryDTO.getCategoryName());
