@@ -2,7 +2,7 @@ package com.ra.model.dto;
 
 public interface ICartItem {
 
-    Integer getProductId();
+    Long getProductId();
 
     Integer getPrice();
 

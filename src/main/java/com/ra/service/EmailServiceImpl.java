@@ -22,21 +22,26 @@ public class EmailServiceImpl implements EmailService {
     @Autowired
     private OrderDetailRepository orderDetailRepository;
 
+
+    @Override
+    public String sendThanks(String email, Orders orders) {
+        try {
+            SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
+            simpleMailMessage.setFrom("jav2306@gmail.com");
+            simpleMailMessage.setTo(orders.getUser().getEmail());
+            simpleMailMessage.setText("Thank you for your purchase");
+            simpleMailMessage.setSubject("COGO fresh fruit store");
+            javaMailSender.send(simpleMailMessage);
+            return "OK sent successfully";
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
     @Override
     public String sendMail(User userLogin, Orders orders) {
-//        try {
-//            SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
-//            simpleMailMessage.setFrom("jav2306@gmail.com");
-//            simpleMailMessage.setTo("tranhongson283@gmail.com");
-//            simpleMailMessage.setText("Thank you for your purchase");
-//            simpleMailMessage.setSubject("COGO fresh fruit store");
-//            javaMailSender.send(simpleMailMessage);
-//            return "OK sent successfully";
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        return null;
-
         try {
             MimeMessage message = javaMailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
@@ -69,6 +74,7 @@ public class EmailServiceImpl implements EmailService {
         emailContentBuilder.append("<tr><th style=\"background-color: #f2f2f2; text-align: left;\">OrderDate</th><td>").append(orders.getOrder_date()).append("</td></tr>");
         emailContentBuilder.append("<tr style=\"background-color: #f2f2f2;\"><th style=\"text-align: left;\">PhoneNumber</th><td>").append(orders.getPhone()).append("</td></tr>");
         emailContentBuilder.append("<tr><th style=\"background-color: #f2f2f2; text-align: left;\">Address</th><td>").append(orders.getAddress()).append("</td></tr>");
+
         DecimalFormat decimalFormat = new DecimalFormat("#,###.##");
         String formattedAmount = decimalFormat.format(orders.getTotal());
         emailContentBuilder.append("<tr style=\"background-color: #f2f2f2;\"><th style=\"text-align: left;\">Total</th><td>").append(formattedAmount).append(" VND</td></tr>");

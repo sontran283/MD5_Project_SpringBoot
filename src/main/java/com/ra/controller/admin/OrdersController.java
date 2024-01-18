@@ -4,6 +4,10 @@ import com.ra.exception.CustomException;
 import com.ra.exception.OrderNotFoundException;
 import com.ra.model.dto.response.OrderResponseDTO;
 import com.ra.model.entity.Orders;
+import com.ra.model.entity.User;
+import com.ra.repository.UserRepository;
+import com.ra.security.user_principle.UserDetailService;
+import com.ra.service.EmailService;
 import com.ra.service.OrdersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -12,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,6 +26,10 @@ import java.util.List;
 public class OrdersController {
     @Autowired
     private OrdersService ordersService;
+    @Autowired
+    private EmailService emailService;
+    @Autowired
+    private UserRepository userRepository;
 
     // index
     @GetMapping("/orders/index")
@@ -36,7 +45,7 @@ public class OrdersController {
         if (orderResponseDTO != null) {
             return new ResponseEntity<>(orderResponseDTO, HttpStatus.OK);
         }
-        return new ResponseEntity<>("NOT_FOUND", HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>("Order id not found", HttpStatus.NOT_FOUND);
     }
 
     // changeStatus
@@ -44,16 +53,27 @@ public class OrdersController {
     public ResponseEntity<?> changeStatus(@PathVariable("id") Long id, @RequestParam String status) throws CustomException, OrderNotFoundException {
         try {
             int orderStatus = Integer.parseInt(status);
-            Long ChangeOrderId = Long.valueOf(id);
+            Long changeOrderId = Long.valueOf(id);
+
             if (orderStatus < 0 || orderStatus > 2) {
                 throw new NumberFormatException("Invalid order status");
             }
-            ordersService.changeStatus(ChangeOrderId, orderStatus);
+
+            Orders changedOrder = ordersService.findOrdersById(changeOrderId);
+            if (orderStatus == 1 && changedOrder.getStatus() == 0) {
+                User user = userRepository.findById(changedOrder.getUser().getId()).orElse(null);
+                if (user != null) {
+                    emailService.sendMail(user, changedOrder);
+                }
+            }
+
+            ordersService.changeStatus(changeOrderId, orderStatus);
             return new ResponseEntity<>("Status changed", HttpStatus.OK);
         } catch (NumberFormatException e) {
             return new ResponseEntity<>("BAD_REQUEST", HttpStatus.BAD_REQUEST);
         }
     }
+
 
     // get ListOrderByStatus
     @GetMapping("/orders/ListOrderByStatus")

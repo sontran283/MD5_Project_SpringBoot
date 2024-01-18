@@ -38,11 +38,17 @@ public class CartController {
 
     // add to cart
     @PostMapping("/addToCart")
-    public ResponseEntity<String> addToCart(@RequestBody AddtoCartRequestDTO addtoCartRequestDTO, Authentication authentication) {
+    public ResponseEntity<String> addToCart(@RequestBody AddtoCartRequestDTO addtoCartRequestDTO, Authentication authentication, User user) {
         try {
+            // nếu chưa đăng nhập thì bắt đăng nhập mới addtocart
+            if (authentication == null || !authentication.isAuthenticated()) {
+                return new ResponseEntity<>("User not logged in. Please log in", HttpStatus.UNAUTHORIZED);
+            }
+
             Long userId = userDetailService.getUserIdFromAuthentication(authentication);
             cartService.addToCart(userId, addtoCartRequestDTO);
             return new ResponseEntity<>("Product added to cart successfully", HttpStatus.OK);
+
         } catch (UserNotFoundException e) {
             return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
         } catch (ProductNotFoundException e) {
@@ -95,12 +101,14 @@ public class CartController {
         try {
             Long userId = userDetailService.getUserIdFromAuthentication(authentication);
             User user = userRepository.findById(userId).orElse(null);
-            if (!user.getCart().getCartItems().isEmpty()) {
+
+            // nếu cart rỗng thì không được checkout
+            if (!user.getCart().getCartItems().isEmpty() && user != null) {
                 Orders orders = ordersService.checkout(user);
-                emailService.sendMail(user, orders);
+                emailService.sendThanks("thanks!", orders);
                 return new ResponseEntity<>("Checkout successful", HttpStatus.OK);
             } else {
-                return new ResponseEntity<>("BAD_REQUEST", HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>("Cart is empty. Cannot proceed with checkout", HttpStatus.BAD_REQUEST);
             }
         } catch (Exception e) {
             return new ResponseEntity<>("Error during checkout: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);

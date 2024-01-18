@@ -5,4 +5,6 @@ import com.ra.model.entity.User;
 
 public interface EmailService {
     String sendMail(User user, Orders orders);
+
+    String sendThanks(String email, Orders orders);
 }
