@@ -91,6 +91,9 @@ public class ProductController {
     @PutMapping("/products/{id}")
     public ResponseEntity<?> updateProduct(@PathVariable("id") Long id, @ModelAttribute ProductRequestDTO productRequestDTO) throws ProductException {
         ProductResponseDTO updatedProductRequest = productService.findById(id);
+        if (updatedProductRequest == null) {
+            return new ResponseEntity<>("Could not find the id of the product that needs repair", HttpStatus.BAD_REQUEST);
+        }
         productRequestDTO.setId(updatedProductRequest.getId());
         ProductResponseDTO updatedProduct = productService.saveOrUpdate(productRequestDTO);
         return new ResponseEntity<>(updatedProduct, HttpStatus.OK);

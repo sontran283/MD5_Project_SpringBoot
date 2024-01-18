@@ -43,13 +43,13 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductResponseDTO saveOrUpdate(ProductRequestDTO productDTO) throws ProductException {
         // check da ton tai
-        if (categoryRepository.existsByCategoryName(productDTO.getName())) {
+        if (productRepository.existsByName(productDTO.getName())) {
             throw new ProductException("productName already exists!");
         }
 
         // check trường hợp trống trường dữ liệu
         if (StringUtils.isBlank(productDTO.getName()) || productDTO.getPrice() == null || productDTO.getCategoryId() == null) {
-            throw new ProductException("Product name, price, categoryId is required");
+            throw new ProductException("cannot be left blank");
         }
 
         // check trường hợp trống trường file
@@ -80,6 +80,11 @@ public class ProductServiceImpl implements ProductService {
             return new ProductResponseDTO(productNew);
         } else {
             ProductResponseDTO productResponseDTO = findById(productDTO.getId());
+            // check da ton tai
+            if (productRepository.existsByName(productDTO.getName())) {
+                throw new ProductException("productName already exists!");
+            }
+
             String fileName = null;
             if (productDTO.getFile() != null && !productDTO.getFile().isEmpty()) {
                 fileName = uploadService.uploadImage(productDTO.getFile());

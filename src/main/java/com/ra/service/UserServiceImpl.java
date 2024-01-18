@@ -181,7 +181,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public void changeStatus(Long id) throws CustomException {
         UserResponseDTO userResponseDTO = findById(id);
-        userRepository.changeStatus(id);
+        if (userResponseDTO.getRoles().contains("ADMIN")) {
+            throw new CustomException("Cannot change admin status");
+        }
+        if (userResponseDTO != null && !userResponseDTO.getRoles().contains("ADMIN")) {
+            userRepository.changeStatus(id);
+        }
     }
 
     @Override

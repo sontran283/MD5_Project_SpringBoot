@@ -96,18 +96,12 @@ public class UserController {
     // change status
     @PatchMapping("/users/{id}")
     public ResponseEntity<?> changeStatus(@PathVariable Long id) throws CustomException {
-        try {
+        UserResponseDTO userResponseDTO = userService.findById(id);
+        if (userResponseDTO != null) {
             userService.changeStatus(id);
-            UserResponseDTO userResponseDTO = userService.findById(id);
-
-            if (userResponseDTO.getRoles().contains("ADMIN")) {
-                return new ResponseEntity<>("Cannot change status for ADMIN", HttpStatus.BAD_REQUEST);
-            }
-
             return new ResponseEntity<>(userResponseDTO, HttpStatus.OK);
-        } catch (CustomException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
+        return new ResponseEntity<>("NOT_FOUND", HttpStatus.NOT_FOUND);
     }
 
     // change Role
