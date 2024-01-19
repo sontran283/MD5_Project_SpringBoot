@@ -42,9 +42,14 @@ public class CategoryServiceImpl implements CategoryService {
             throw new CategoryException("categoryName already exists!");
         }
 
-        // Kiểm tra trường hợp trống trường dữ liệu
+        // check trường hợp trống trường dữ liệu
         if (StringUtils.isBlank(categoryDTO.getCategoryName())) {
             throw new CategoryException("CategoryName is required");
+        }
+
+        // check trường hợp có khoảng trắng ở đầu hoặc cuối chuỗi
+        if (categoryDTO.getCategoryName().startsWith(" ") || categoryDTO.getCategoryName().endsWith(" ")) {
+            throw new CategoryException("CategoryName cannot have leading or trailing spaces");
         }
 
         if (categoryDTO.getId() == null) {

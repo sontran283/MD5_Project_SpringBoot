@@ -1,5 +1,6 @@
 package com.ra.service;
 
+import com.ra.exception.CategoryException;
 import com.ra.exception.CustomException;
 import com.ra.exception.ProductException;
 import com.ra.model.dto.request.ProductRequestDTO;
@@ -50,6 +51,11 @@ public class ProductServiceImpl implements ProductService {
         // check trường hợp trống trường dữ liệu
         if (StringUtils.isBlank(productDTO.getName()) || productDTO.getPrice() == null || productDTO.getCategoryId() == null) {
             throw new ProductException("cannot be left blank");
+        }
+
+        // check trường hợp có khoảng trắng ở đầu hoặc cuối chuỗi
+        if (productDTO.getName().startsWith(" ") || productDTO.getName().endsWith(" ")) {
+            throw new ProductException("ProductName cannot have leading or trailing spaces");
         }
 
         // check trường hợp trống trường file
