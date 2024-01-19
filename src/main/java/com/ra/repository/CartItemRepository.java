@@ -12,35 +12,15 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-
+@Transactional
 public interface CartItemRepository extends JpaRepository<Cart_item, Long> {
-    @Transactional
     @Modifying
     @Query("DELETE FROM Cart_item ci WHERE ci.id = :Id")
     void deleteByCartItemId(@Param("Id") Long Id);
 
-    @Transactional
     @Modifying
-    @Query("DELETE FROM Cart_item ci WHERE ci.id = :Id AND ci.cart.user.id = :userId")
-    void deleteByCartItemIdAndUserId(@Param("Id") Long Id, @Param("userId") Long userId);
-    @Transactional
-    @Modifying
-    @Query("delete FROM Cart_item c WHERE c.cart.id = :id")
+    @Query("DELETE FROM Cart_item c WHERE c.cart.id = :id")
     void deleteCartItemByCartId(@Param("id") Long id);
-
-    Cart_item findAllByCartAndProduct(Cart cart, Product product);
-
-    Boolean existsCart_itemByCartAndProduct(Cart cart, Product product);
-
-    Cart_item findByCartAndProduct(Cart cart, Product product);
-
-    Cart_item findCart_itemById(Long id);
-
-    List<Cart_item> findAllByCart_Id(Long id);
-
-    Cart_item findByCart(Cart cart);
-
-    List<Cart_item> findAllByCart(Cart cart);
 
     @Query("SELECT ci.product FROM Cart_item ci WHERE ci.cart.user.id = :userId")
     List<Cart_item> getCartItems(@Param("userId") Long userId);
@@ -49,4 +29,13 @@ public interface CartItemRepository extends JpaRepository<Cart_item, Long> {
             "cart_item ci join product p on p.id = ci.product_id join cart c on c.id = ci.cart_id" +
             " where c.user_id = :userId", nativeQuery = true)
     List<ICartItem> getCartItems1(@Param("userId") Long userId);
+
+
+    Boolean existsCart_itemByCartAndProduct(Cart cart, Product product);
+
+    Cart_item findByCartAndProduct(Cart cart, Product product);
+
+    Cart_item findCart_itemById(Long id);
+
+    List<Cart_item> findAllByCart(Cart cart);
 }

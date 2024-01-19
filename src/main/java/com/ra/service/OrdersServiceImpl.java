@@ -2,6 +2,7 @@ package com.ra.service;
 
 import com.ra.exception.CustomException;
 import com.ra.exception.OrderNotFoundException;
+import com.ra.exception.ProductException;
 import com.ra.model.dto.request.OrderRequestDTO;
 import com.ra.model.dto.response.OrderResponseDTO;
 import com.ra.model.entity.*;
@@ -75,9 +76,16 @@ public class OrdersServiceImpl implements OrdersService {
 
 
     @Override
-    public Page<OrderResponseDTO> searchOrdersById(Pageable pageable, Integer id) {
-        Page<Orders> ordersPage = ordersRepository.findOrdersById(pageable, id);
-        return ordersPage.map(OrderResponseDTO::new);
+    public Page<OrderResponseDTO> searchOrdersById(Pageable pageable, Integer id) throws CustomException, NumberFormatException {
+        try {
+            if (id == null) {
+                throw new NumberFormatException("No orders found with the given Id");
+            }
+            Page<Orders> ordersPage = ordersRepository.findOrdersById(pageable, id);
+            return ordersPage.map(OrderResponseDTO::new);
+        } catch (NumberFormatException e) {
+            throw new CustomException("Invalid id: " + e.getMessage());
+        }
     }
 
     @Transactional
@@ -118,7 +126,7 @@ public class OrdersServiceImpl implements OrdersService {
 
     @Override
     public void changeStatus(Long id, int status) throws OrderNotFoundException {
-        Orders orders = ordersRepository.findById(id).orElseThrow(() -> new OrderNotFoundException("NOT_FOUND"));
+        Orders orders = ordersRepository.findById(id).orElseThrow(() -> new OrderNotFoundException("Order id not found"));
         if (orders.getStatus() == 0) {
             throw new OrderNotFoundException("Order has been CONFIRM, status cannot be changed");
         }

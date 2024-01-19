@@ -24,7 +24,7 @@ public interface OrdersService {
 
     OrderResponseDTO saveOrUpdate(OrderRequestDTO orderRequestDTO) throws CustomException;
 
-    Page<OrderResponseDTO> searchOrdersById(Pageable pageable, Integer id);
+    Page<OrderResponseDTO> searchOrdersById(Pageable pageable, Integer id) throws CustomException,NumberFormatException;
 
     Orders checkout(User user);
 

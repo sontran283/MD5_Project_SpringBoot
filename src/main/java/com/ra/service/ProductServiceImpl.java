@@ -126,8 +126,14 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Page<ProductResponseDTO> searchByName(Pageable pageable, String name) {
+    public Page<ProductResponseDTO> searchByName(Pageable pageable, String name) throws ProductException {
+        if (StringUtils.isBlank(name)) {
+            throw new ProductException("Product name cannot be blank");
+        }
         Page<Product> productPage = productRepository.searchProductByName(pageable, name);
+        if (productPage.isEmpty()) {
+            throw new ProductException("No products found with the given name");
+        }
         return productPage.map(ProductResponseDTO::new);
     }
 

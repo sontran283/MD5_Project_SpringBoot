@@ -7,7 +7,6 @@ import com.ra.model.dto.response.CategoryResponseDTO;
 import com.ra.model.dto.response.ProductResponseDTO;
 import com.ra.service.CategoryService;
 import com.ra.service.ProductService;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -50,7 +49,7 @@ public class ProductController {
             @RequestParam(name = "size", defaultValue = "3") int size,
             @RequestParam(name = "sort", defaultValue = "id") String sort,
             @RequestParam(name = "order", defaultValue = "asc") String order,
-            @RequestParam(name = "search") String search) {
+            @RequestParam(name = "search") String search) throws ProductException {
         Pageable pageable;
         if (order.equals("asc")) {
             pageable = PageRequest.of(page, size, Sort.by(sort).ascending());
@@ -87,6 +86,7 @@ public class ProductController {
         return new ResponseEntity<>("NOT_FOUND", HttpStatus.NOT_FOUND);
     }
 
+
     // update
     @PutMapping("/products/{id}")
     public ResponseEntity<?> updateProduct(@PathVariable("id") Long id, @ModelAttribute ProductRequestDTO productRequestDTO) throws ProductException {
@@ -102,14 +102,17 @@ public class ProductController {
     // change status
     @PatchMapping("/products/{id}")
     public ResponseEntity<?> changeStatus(@PathVariable Long id) {
-        productService.changeStatus(id);
         ProductResponseDTO productResponseDTO = productService.findById(id);
-        return new ResponseEntity<>(productResponseDTO, HttpStatus.OK);
+        if (productResponseDTO == null) {
+            return new ResponseEntity<>("Could not find the id of the product that needs repair", HttpStatus.BAD_REQUEST);
+        }
+        productService.changeStatus(id);
+        return new ResponseEntity<>("Status change successful", HttpStatus.OK);
     }
 
     // delete
     @DeleteMapping("/products/{id}")
-    public ResponseEntity<?> deleteProduct(@PathVariable("id") Long id) throws ProductException, CustomException {
+    public ResponseEntity<?> deleteProduct(@PathVariable("id") Long id) throws CustomException {
         if (productService.findProductById(id) != null) {
             productService.delete(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);

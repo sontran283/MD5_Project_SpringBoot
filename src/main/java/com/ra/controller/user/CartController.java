@@ -6,8 +6,10 @@ import com.ra.model.dto.ICartItem;
 import com.ra.model.dto.request.AddtoCartRequestDTO;
 import com.ra.model.entity.Cart_item;
 import com.ra.model.entity.Orders;
+import com.ra.model.entity.Product;
 import com.ra.model.entity.User;
 import com.ra.repository.CartItemRepository;
+import com.ra.repository.ProductRepository;
 import com.ra.repository.UserRepository;
 import com.ra.security.user_principle.UserDetailService;
 import com.ra.service.*;
@@ -34,20 +36,30 @@ public class CartController {
     private UserRepository userRepository;
     @Autowired
     private EmailService emailService;
+    @Autowired
+    private ProductRepository productRepository;
+    @Autowired
+    private ProductService productService;
 
 
     // add to cart
     @PostMapping("/addToCart")
-    public ResponseEntity<String> addToCart(@RequestBody AddtoCartRequestDTO addtoCartRequestDTO, Authentication authentication, User user) {
+    public ResponseEntity<String> addToCart(@RequestBody AddtoCartRequestDTO addtoCartRequestDTO, Authentication authentication) {
         try {
             // nếu chưa đăng nhập thì bắt đăng nhập mới addtocart
             if (authentication == null || !authentication.isAuthenticated()) {
                 return new ResponseEntity<>("User not logged in. Please log in", HttpStatus.UNAUTHORIZED);
             }
-
             Long userId = userDetailService.getUserIdFromAuthentication(authentication);
+
+            // kiểm tra product xem có true không
+            Product product = productRepository.findById(addtoCartRequestDTO.getProductId()).orElseThrow(() -> new ProductNotFoundException("Product not found"));
+            if (product == null || !product.getStatus()) {
+                return new ResponseEntity<>("Invalid productId. Please enter a valid product code.", HttpStatus.BAD_REQUEST);
+            }
+
             cartService.addToCart(userId, addtoCartRequestDTO);
-            return new ResponseEntity<>("Product added to cart successfully", HttpStatus.OK);
+            return new ResponseEntity<>("addToCart successfully", HttpStatus.OK);
 
         } catch (UserNotFoundException e) {
             return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);

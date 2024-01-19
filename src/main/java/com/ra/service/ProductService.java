@@ -23,7 +23,7 @@ public interface ProductService {
 
     Page<ProductResponseDTO> getAll(Pageable pageable);
 
-    Page<ProductResponseDTO> searchByName(Pageable pageable, String name);
+    Page<ProductResponseDTO> searchByName(Pageable pageable, String name) throws ProductException;
 
     void changeStatus(Long id);
 }

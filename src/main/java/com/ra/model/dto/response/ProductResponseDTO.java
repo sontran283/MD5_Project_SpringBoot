@@ -2,7 +2,6 @@ package com.ra.model.dto.response;
 
 
 import com.ra.model.entity.Product;
-import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

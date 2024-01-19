@@ -44,6 +44,10 @@ public class CartServiceImpl implements CartService {
         Cart cart = cartRepository.findByUser(user1);
         Product product = productRepository.findById(addtoCartRequestDTO.getProductId()).orElseThrow(() -> new ProductNotFoundException("product id not found"));
 
+        if (!product.getStatus()){
+            throw new ProductNotFoundException("This product is currently off, you can add to cart");
+        }
+
         if (cart == null) {
             Cart cart1 = new Cart();
             cart1.setUser(user1);

@@ -16,14 +16,6 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
     Cart findByUser(User user);
 
     @Modifying
-    @Query("UPDATE Cart_item ci SET ci.cart = :cart, ci.product = :product WHERE ci.cart.user.id = :userId AND ci.product.id = :productId")
-    void addToCart(@Param("userId") Long userId, @Param("productId") Long productId, @Param("cart") Cart cart, @Param("product") Product product);
-
-    @Modifying
     @Query("SELECT ci.product FROM Cart_item ci WHERE ci.cart.user.id = :userId")
     List<Product> getCartItems(@Param("userId") Long userId);
-
-    @Modifying
-    @Query("DELETE FROM Cart_item ci WHERE ci.cart.user.id = :userId")
-    void clearCart(@Param("userId") Long userId);
 }

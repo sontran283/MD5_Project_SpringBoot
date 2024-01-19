@@ -6,7 +6,6 @@ import com.ra.model.dto.response.OrderResponseDTO;
 import com.ra.model.entity.Orders;
 import com.ra.model.entity.User;
 import com.ra.repository.UserRepository;
-import com.ra.security.user_principle.UserDetailService;
 import com.ra.service.EmailService;
 import com.ra.service.OrdersService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,12 +15,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
+@CrossOrigin("*")
 @RequestMapping("/admin")
 public class OrdersController {
     @Autowired
@@ -30,6 +29,25 @@ public class OrdersController {
     private EmailService emailService;
     @Autowired
     private UserRepository userRepository;
+
+
+    // search-sort-pagination
+    @GetMapping("/orders/search-sort-pagination")
+    public ResponseEntity<Page<OrderResponseDTO>> getOrders(
+            @RequestParam(name = "search") Integer id,
+            @RequestParam(name = "sort", defaultValue = "id") String sort,
+            @RequestParam(name = "order", defaultValue = "asc") String order,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "3") int size) throws CustomException, NumberFormatException {
+        Pageable pageable;
+        if (order.equals("asc")) {
+            pageable = PageRequest.of(page, size, Sort.by(sort).ascending());
+        } else {
+            pageable = PageRequest.of(page, size, Sort.by(sort).descending());
+        }
+        Page<OrderResponseDTO> ordersDTOPage = ordersService.searchOrdersById(pageable, id);
+        return new ResponseEntity<>(ordersDTOPage, HttpStatus.OK);
+    }
 
     // index
     @GetMapping("/orders/index")
@@ -46,6 +64,13 @@ public class OrdersController {
             return new ResponseEntity<>(orderResponseDTO, HttpStatus.OK);
         }
         return new ResponseEntity<>("Order id not found", HttpStatus.NOT_FOUND);
+    }
+
+    // get ListOrderByStatus
+    @GetMapping("/orders/ListOrderByStatus")
+    public ResponseEntity<?> ListOrderByStatus(@RequestParam Integer status) {
+        List<OrderResponseDTO> ordersList = ordersService.getListOrderByStatus(status);
+        return new ResponseEntity<>(ordersList, HttpStatus.OK);
     }
 
     // changeStatus
@@ -72,33 +97,5 @@ public class OrdersController {
         } catch (NumberFormatException e) {
             return new ResponseEntity<>("BAD_REQUEST", HttpStatus.BAD_REQUEST);
         }
-    }
-
-
-    // get ListOrderByStatus
-    @GetMapping("/orders/ListOrderByStatus")
-    public ResponseEntity<?> ListOrderByStatus(@RequestParam Integer status) {
-        List<OrderResponseDTO> ordersList = ordersService.getListOrderByStatus(status);
-        return new ResponseEntity<>(ordersList, HttpStatus.OK);
-    }
-
-
-    // search-sort-pagination
-    @GetMapping("/orders/search-sort-pagination")
-    public ResponseEntity<Page<OrderResponseDTO>> getOrders(
-            @RequestParam(name = "search") Integer id,
-            @RequestParam(name = "sort", defaultValue = "id") String sort,
-            @RequestParam(name = "order", defaultValue = "asc") String order,
-            @RequestParam(name = "page", defaultValue = "0") int page,
-            @RequestParam(name = "size", defaultValue = "3") int size) {
-        Pageable pageable;
-        if (order.equals("asc")) {
-            pageable = PageRequest.of(page, size, Sort.by(sort).ascending());
-        } else {
-            pageable = PageRequest.of(page, size, Sort.by(sort).descending());
-        }
-
-        Page<OrderResponseDTO> ordersDTOPage = ordersService.searchOrdersById(pageable, id);
-        return new ResponseEntity<>(ordersDTOPage, HttpStatus.OK);
     }
 }

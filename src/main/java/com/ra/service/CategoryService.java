@@ -1,5 +1,6 @@
 package com.ra.service;
 
+import com.ra.exception.CategoryException;
 import com.ra.exception.CustomException;
 import com.ra.model.dto.request.CategoryRequestDTO;
 import com.ra.model.dto.response.CategoryResponseDTO;
@@ -13,11 +14,13 @@ public interface CategoryService {
 
     void delete(Long id);
 
-    CategoryResponseDTO saveOrUpdate(CategoryRequestDTO category) throws CustomException;
+    CategoryResponseDTO saveOrUpdate(CategoryRequestDTO category) throws CategoryException;
 
-    CategoryResponseDTO findById(Long id) ;
+    CategoryResponseDTO findById(Long id);
 
-    Page<CategoryResponseDTO> searchByName(Pageable pageable, String name);
+    Page<CategoryResponseDTO> searchByName(Pageable pageable, String name) throws CategoryException;
 
     void changeStatus(Long id);
+
+    boolean checkProductsInCategory(Long categoryId);
 }

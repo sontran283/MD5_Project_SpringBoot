@@ -7,6 +7,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.lang.NumberFormatException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -48,6 +49,16 @@ public class ApplicationHandler {
 
     @ExceptionHandler(ProductException.class)
     public ResponseEntity<String> ProductException(ProductException e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(ProductNotFoundException.class)
+    public ResponseEntity<String> ProductNotFoundException(ProductNotFoundException e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(NumberFormatException.class)
+    public ResponseEntity<String> NumberFormatException(NumberFormatException e) {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
     }
 }

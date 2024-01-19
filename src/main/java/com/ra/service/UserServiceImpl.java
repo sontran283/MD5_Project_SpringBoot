@@ -235,9 +235,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponseAllDTO changeProfile(Long id, UserRequestDTO userRequestDTO) throws CustomException {
         User user = userRepository.findById(id).orElse(null);
-//        if (userRepository.existsByUserName(userRequestDTO.getUserName())) {
-//            throw new CustomException("UserName already exists!");
-//        }
+        if (userRepository.existsByUserName(userRequestDTO.getUserName())) {
+            throw new CustomException("UserName already exists!");
+        }
         assert user != null;
         user.setUserName(userRequestDTO.getUserName());
         user.setAddress(userRequestDTO.getAddress());
