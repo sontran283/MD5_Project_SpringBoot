@@ -74,17 +74,24 @@ public class CategoryController {
         return new ResponseEntity<>("NOT_FOUND", HttpStatus.NOT_FOUND);
     }
 
+
     // update
     @PutMapping("/category/{id}")
-    public ResponseEntity<?> updateCategory(@PathVariable("id") Long id, @ModelAttribute CategoryRequestDTO categoryDTO) throws CategoryException {
-        CategoryResponseDTO category = categoryService.findById(id);
-        if (category == null) {
-            return new ResponseEntity<>("Could not find the id of the category that needs repair", HttpStatus.BAD_REQUEST);
+    public ResponseEntity<?> updateCategory(@PathVariable("id") String id, @ModelAttribute CategoryRequestDTO categoryDTO) throws CategoryException {
+        try {
+            Long categoryId = Long.parseLong(id);
+            CategoryResponseDTO category = categoryService.findById(categoryId);
+            if (category == null) {
+                return new ResponseEntity<>("Could not find the id of the category that needs repair", HttpStatus.BAD_REQUEST);
+            }
+            categoryDTO.setId(categoryId);
+            CategoryResponseDTO updatedCategory = categoryService.saveOrUpdate(categoryDTO);
+            return new ResponseEntity<>(updatedCategory, HttpStatus.OK);
+        } catch (NumberFormatException e) {
+            return new ResponseEntity<>("Incorrect format, please re-enter", HttpStatus.BAD_REQUEST);
         }
-        categoryDTO.setId(category.getId());
-        CategoryResponseDTO updatedCategory = categoryService.saveOrUpdate(categoryDTO);
-        return new ResponseEntity<>(updatedCategory, HttpStatus.OK);
     }
+
 
     // change status
     @PatchMapping("/category/{id}")
