@@ -1,8 +1,10 @@
 package com.ra.service;
 
+import com.ra.exception.CustomException;
 import com.ra.exception.ProductNotFoundException;
 import com.ra.exception.UserNotFoundException;
 import com.ra.model.dto.request.AddtoCartRequestDTO;
+import com.ra.model.dto.request.UpdateCartItemRequestDTO;
 import com.ra.model.entity.Cart;
 import com.ra.model.entity.Cart_item;
 import com.ra.model.entity.Product;
@@ -24,4 +26,6 @@ public interface CartService {
     void clearCart(Long id);
 
     double cartTotal(User user);
+
+    void updateCartItem(Long userId, UpdateCartItemRequestDTO updateCartItemRequestDTO) throws UserNotFoundException, CustomException;
 }

@@ -1,9 +1,11 @@
 package com.ra.controller.user;
 
+import com.ra.exception.CustomException;
 import com.ra.exception.ProductNotFoundException;
 import com.ra.exception.UserNotFoundException;
 import com.ra.model.dto.ICartItem;
 import com.ra.model.dto.request.AddtoCartRequestDTO;
+import com.ra.model.dto.request.UpdateCartItemRequestDTO;
 import com.ra.model.entity.Cart_item;
 import com.ra.model.entity.Orders;
 import com.ra.model.entity.Product;
@@ -83,6 +85,25 @@ public class CartController {
             }
         } catch (UserNotFoundException e) {
             return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+        }
+    }
+
+    
+    // sửa sl trong cart
+    @PutMapping("/updateCartItem")
+    public ResponseEntity<String> updateCartItem(@RequestBody UpdateCartItemRequestDTO updateCartItemRequestDTO, Authentication authentication) {
+        try {
+            // Kiểm tra xác thực
+            if (authentication == null || !authentication.isAuthenticated()) {
+                return new ResponseEntity<>("User not logged in. Please log in", HttpStatus.UNAUTHORIZED);
+            }
+
+            Long userId = userDetailService.getUserIdFromAuthentication(authentication);
+            cartService.updateCartItem(userId, updateCartItemRequestDTO);
+            return new ResponseEntity<>("Cart item updated successfully", HttpStatus.OK);
+
+        } catch (UserNotFoundException | CustomException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 

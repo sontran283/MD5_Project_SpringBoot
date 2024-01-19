@@ -1,8 +1,10 @@
 package com.ra.service;
 
+import com.ra.exception.CustomException;
 import com.ra.exception.ProductNotFoundException;
 import com.ra.exception.UserNotFoundException;
 import com.ra.model.dto.request.AddtoCartRequestDTO;
+import com.ra.model.dto.request.UpdateCartItemRequestDTO;
 import com.ra.model.entity.Cart;
 import com.ra.model.entity.Cart_item;
 import com.ra.model.entity.Product;
@@ -44,7 +46,7 @@ public class CartServiceImpl implements CartService {
         Cart cart = cartRepository.findByUser(user1);
         Product product = productRepository.findById(addtoCartRequestDTO.getProductId()).orElseThrow(() -> new ProductNotFoundException("product id not found"));
 
-        if (!product.getStatus()){
+        if (!product.getStatus()) {
             throw new ProductNotFoundException("This product is currently off, you can add to cart");
         }
 
@@ -92,5 +94,22 @@ public class CartServiceImpl implements CartService {
     public double cartTotal(User user) {
         List<Product> cartItems = getCartItems(user);
         return cartItems.stream().mapToDouble(Product::getPrice).sum();
+    }
+
+    @Override
+    public void updateCartItem(Long userId, UpdateCartItemRequestDTO updateCartItemRequestDTO) throws CustomException, UserNotFoundException {
+        // Kiểm tra sự tồn tại của người dùng và sản phẩm
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
+        Cart_item cartItem = cartItemRepository.findById(updateCartItemRequestDTO.getCartItemId())
+                .orElseThrow(() -> new CustomException("Cart item not found"));
+
+        // Kiểm tra sự hợp lệ của số lượng
+        if (updateCartItemRequestDTO.getQuantity() > 0) {
+            // Cập nhật số lượng và lưu lại vào cơ sở dữ liệu
+            cartItem.setQuantity(updateCartItemRequestDTO.getQuantity());
+            cartItemRepository.save(cartItem);
+        } else {
+            throw new CustomException("Invalid quantity. Please enter a valid quantity.");
+        }
     }
 }
